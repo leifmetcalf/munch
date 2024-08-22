@@ -1,0 +1,21 @@
+* {
+  margin: unset;
+}
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  float: left;
+  background: pink;
+}
+#content {
+  background: lightgrey;
+}
+#reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review {
+  background: lightgreen;
+}

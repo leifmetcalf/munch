@@ -1,0 +1,41 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dine</title>
+  </head>
+  <body>
+    <div id='body'>
+    <div id='sidebar'>
+    <h1>munchie.zone</h1>
+    <div>search: ________________</div>
+    <a href='/explore'>explore</a>
+    <a href='/feed'>feed</a>
+    <a href='/profile'>profile</a>
+    <a href='/settings'>settings</a>
+    <a href='/log'>LOG A FEED</a>
+    <a href='/create-list'>CREATE A LIST</a>
+    </div>
+    <div id='content'>
+    <h1>Restaurants</h1>
+    <div id='restaurants'>
+    {% for restaurant in restaurants %}
+    <li>{{ restaurant.name }}</li>
+    {% endfor %}
+    </ul>
+    <h1>Latest reviews</h1>
+    <div id='reviews'>
+    {% for review in new_reviews %}
+    <div class='review'>
+    <p>{{ review.restaurant.name }}</p>
+    <p>{{ review.publish_time.date }}</p>
+    <p>{{ review.text }}</p>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
