@@ -1,15 +1,31 @@
 * {
   margin: unset;
 }
+#body {
+  display: flex;
+  gap: 10px;
+  height: 100vh;
+}
 #sidebar {
   display: flex;
   flex-direction: column;
-  width: 300px;
-  float: left;
+  width: 200px;
   background: pink;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 #content {
   background: lightgrey;
+  padding: 10px;
+  flex-grow: 1;
+  height: full
+}
+#content-inner {
+  min-width: 300px;
+  max-width: 600px;
+  width: full;
 }
 #reviews {
   display: flex;
@@ -18,4 +34,37 @@
 }
 .review {
   background: lightgreen;
+}
+
+#title {
+  font-size: 1.7em;
+  font-weight: bold;
+  font-family: monospace;
+  padding-bottom: 10px;
+}
+
+h1 {
+  font-family: monospace;
+  font-size: 1.3em;
+}
+
+#log-form {
+  position: fixed;
+  visibility: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  align-content: center;
+  justify-content: center;
+}
+
+#log-form > form {
+  background: beige;
+  width: fit-content;
+  margin: auto;
+}
+
+#log-form:target {
+  visibility: visible;
 }

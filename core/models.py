@@ -8,9 +8,9 @@ class Restaurant(models.Model):
         return f'{self.name} {self.coords} {self.notes}'
 
 class Review(models.Model):
-    text = models.CharField(max_length=1000)
-    rating = models.IntegerField()
-    publish_time = models.DateTimeField('date published')
+    text = models.CharField("review text", max_length=1000)
+    rating = models.IntegerField("rating")
+    date = models.DateField("date of meal")
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     def __str__(self):
-        return f'{self.text} {self.rating} {self.publish_time} {self.restaurant}'
+        return f'{self.text} {self.rating} {self.date} {self.restaurant}'
