@@ -2,11 +2,16 @@
   margin: unset;
 }
 #body {
-  display: flex;
-  gap: 10px;
-  height: 100vh;
+  display: grid;
+  grid-template-areas:
+    "h h h"
+    "l c r";
 }
-#sidebar {
+#header {
+  grid-area: h;
+}
+#left {
+  grid-area: l;
   display: flex;
   flex-direction: column;
   width: 200px;
@@ -17,12 +22,16 @@
   padding-right: 15px;
 }
 #content {
+  grid-area: c;
+}
+#right {
+  grid-area: r;
   background: lightgrey;
   padding: 10px;
   flex-grow: 1;
   height: full
 }
-#content-inner {
+#restaurants-list {
   min-width: 300px;
   max-width: 600px;
   width: full;
@@ -50,7 +59,6 @@ h1 {
 
 #log-form {
   position: fixed;
-  visibility: hidden;
   top: 0;
   bottom: 0;
   left: 0;
@@ -63,8 +71,4 @@ h1 {
   background: beige;
   width: fit-content;
   margin: auto;
-}
-
-#log-form:target {
-  visibility: visible;
 }

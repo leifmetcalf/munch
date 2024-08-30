@@ -1,55 +1,51 @@
+{% extends "core/base.html" %}
 {% load static %}
 
-<!doctype html>
+{% block head %}
+<link href="{% static 'core/main.css' %}" rel="stylesheet">
+<script src="{% static 'htmx/htmx.min.js' %}"></script>
+<script src="{% static 'leaflet/leaflet.js' %}"></script>
+<script src="{% static 'core/index.js' %}" defer></script>
+<title>munchie.online</title>
+{% endblock %}
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{% static 'core/main.css'%}" rel="stylesheet">
-    <title>munchie.online</title>
-  </head>
-  <body>
-    <div id='body'>
-      <div id='sidebar'>
-        <div id='title'>munchie.online</div>
-        <div>search: ________________</div>
-        <a href='/explore/'>explore</a>
-        <a href='/feed/'>feed</a>
-        <a href='/profile/'>profile</a>
-        <a href='/settings/'>settings</a>
-        <a href='#log-form'>LOG A FEED</a>
-        <a href='/create-list/'>CREATE A LIST</a>
-      </div>
-    <div id='content'>
-      <div id='content-inner'>
-        <h1>Restaurants</h1>
-        <div id='restaurants'>
-          <ul>
-            {% for restaurant in restaurants %}
-              <li>{{ restaurant.name }}</li>
-            {% endfor %}
-          </ul>
-          <h1>Latest reviews</h1>
-          <div id='reviews'>
-            {% for review in new_reviews %}
-            <div class='review'>
-              <p>{{ review.restaurant.name }}</p>
-              <p>{{ review.date }}</p>
-              <p>{{ review.text }}</p>
-            </div>
-            {% endfor %}
+{% block body %}
+<div id='body'>
+  <div id='header'>
+    <h1>munchie.online</h1>
+  </div>
+  <div id='left'>
+    <div>search: ________________</div>
+    <a href='/explore/'>explore</a>
+    <a href='/feed/'>feed</a>
+    <a href='/profile/'>profile</a>
+    <a href='/settings/'>settings</a>
+    <a href='/log/'>LOG A FEED</a>
+    <a href='/create-list/'>CREATE A LIST</a>
+  </div>
+  <div id='content'>
+  </div>
+  <div id='right'>
+    <div id='restaurants-list'>
+      <h1>Restaurants</h1>
+      <div id='restaurants'>
+        <ul>
+          {% for restaurant in restaurants %}
+            <li>{{ restaurant.name }}</li>
+          {% endfor %}
+        </ul>
+        <h1>Latest reviews</h1>
+        <div id='reviews'>
+          {% for review in new_reviews %}
+          <div class='review'>
+            <p>{{ review.restaurant.name }}</p>
+            <p>{{ review.date }}</p>
+            <p>{{ review.text }}</p>
           </div>
+          {% endfor %}
         </div>
       </div>
     </div>
-    <div id='log-form'>
-      <form action="/log/" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button value="submit">Submit</button>
-        <a href='#'>Close</button>
-      </form>
-    </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}
