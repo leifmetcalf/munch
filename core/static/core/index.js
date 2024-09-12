@@ -1,12 +1,12 @@
-const logButton = document.getElementById("open-log-button");
-const closeButton = document.getElementById("close-log-button");
-const logForm = document.getElementById("log-form");
+const openLogFormButton = document.getElementById("open-log-form");
+const closeLogFormButton = document.getElementById("close-log-form");
+const logFormDialog = document.getElementById("log-form-dialog");
 
-logButton.addEventListener("click", () => {
-  logForm.showModal();
+openLogFormButton.addEventListener("click", () => {
+  logFormDialog.showModal();
 });
 
-cancelButton.addEventListener("click", () => {
-  logForm.close();
+closeLogFormButton.addEventListener("click", () => {
+  logFormDialog.close();
 });
 
