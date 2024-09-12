@@ -14,7 +14,6 @@
   grid-area: l;
   display: flex;
   flex-direction: column;
-  width: 200px;
   background: pink;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -27,15 +26,8 @@
 #right {
   grid-area: r;
   background: lightgrey;
-  padding: 10px;
-  flex-grow: 1;
-  height: full
 }
-#restaurants-list {
-  min-width: 300px;
-  max-width: 600px;
-  width: full;
-}
+
 #reviews {
   display: flex;
   flex-direction: column;
@@ -49,26 +41,9 @@
   font-size: 1.7em;
   font-weight: bold;
   font-family: monospace;
-  padding-bottom: 10px;
 }
 
 h1 {
   font-family: monospace;
   font-size: 1.3em;
-}
-
-#log-form {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  align-content: center;
-  justify-content: center;
-}
-
-#log-form > form {
-  background: beige;
-  width: fit-content;
-  margin: auto;
 }

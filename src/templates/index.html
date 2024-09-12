@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="static/main.css" rel="stylesheet">
+<script src="https://unpkg.com/htmx.org@2.0.2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4"></script>
+<script src="static/index.js" defer></script>
+<title>munchie.online</title>
+{% endblock %}
+
+{% block body %}
+<div id='body'>
+  <div id='header'>
+    <h1 id='title'>munchie.online</h1>
+  </div>
+  <div id='left'>
+    <div>search: ________________</div>
+    <a href='/explore/'>explore</a>
+    <a href='/feed/'>feed</a>
+    <a href='/profile/'>profile</a>
+    <a href='/account/'>account</a>
+    <button id='open-log-form'>LOG A FEED</button>
+    <a href='/create-list/'>CREATE A LIST</a>
+  </div>
+  <div id='content'>
+  </div>
+  <div id='right'>
+    <h1>Restaurants</h1>
+    <div id='restaurants'>
+      {% for restaurant in restaurants %}
+        <p>{{ restaurant.name }}</p>
+      {% endfor %}
+    </div>
+    <h1>Latest reviews</h1>
+    <div id='reviews'>
+      {% for review in new_reviews %}
+      <div class='review'>
+        <p>{{ review.restaurant.name }}</p>
+        <p>{{ review.date }}</p>
+        <p>{{ review.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<dialog id='log-form-dialog'>
+  <div hx-get='/log/' hx-trigger='load'></div>
+  <button id='close-log-form'>Close</button>
+</dialog>
+{% endblock %}
