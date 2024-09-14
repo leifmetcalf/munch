@@ -1,0 +1,7 @@
+{% extends "core/base.html" %}
+
+{% block body %}
+<h1>{{ object.name }}</h1>
+<a href='{{ object.link_google_maps }}'>{{ object.link_google_maps }}</a>
+<p>{{ object.notes }}</p>
+{% endblock %}

@@ -1,15 +1,18 @@
 * {
   margin: unset;
 }
+
 #body {
   display: grid;
   grid-template-areas:
     "h h h"
     "l c r";
 }
+
 #header {
   grid-area: h;
 }
+
 #left {
   grid-area: l;
   display: flex;
@@ -20,9 +23,11 @@
   padding-left: 15px;
   padding-right: 15px;
 }
+
 #content {
   grid-area: c;
 }
+
 #right {
   grid-area: r;
   background: lightgrey;
@@ -33,6 +38,7 @@
   flex-direction: column;
   gap: 10px;
 }
+
 .review {
   background: lightgreen;
 }

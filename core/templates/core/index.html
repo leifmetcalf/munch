@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block head %}
-<link href="{% static 'core/main.css' %}" rel="stylesheet">
 <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
 <script src="https://unpkg.com/leaflet@1.9.4"></script>
 <script src="{% static 'core/index.js' %}" defer></script>
 <title>munchie.online</title>
@@ -15,13 +15,24 @@
     <h1 id='title'>munchie.online</h1>
   </div>
   <div id='left'>
+    <div id='auth'>
+      {% if user.is_authenticated %}
+      <p>Logged in as {{user}}</p>
+      <form method='post' action='{% url "core:logout" %}'>
+        {% csrf_token %}
+        <button type='submit'>logout</button>
+      </form>
+      {% else %}
+      <p><a href='{% url "core:login" %}'>login</a></p>
+      <p><a href='{% url "core:new_user" %}'>create account</a></p>
+      {% endif %}
+    </div>
     <div>search: ________________</div>
-    <a href='/explore/'>explore</a>
-    <a href='/feed/'>feed</a>
-    <a href='/profile/'>profile</a>
-    <a href='/account/'>account</a>
-    <button id='open-log-form'>LOG A FEED</button>
-    <a href='/create-list/'>CREATE A LIST</a>
+    <a href='{% url "core:user_detail" username=user.username %}'>profile</a>
+    <a href='{% url "core:lists" %}'>lists</a>
+    <a href='{% url "core:new_log" %}'>LOG A FEED</a>
+    <a href='{% url "core:new_list" %}'>CREATE A LIST</a>
+    <a href='{% url "core:new_restaurant" %}'>Add a restaurant</a>
   </div>
   <div id='content'>
   </div>
@@ -43,8 +54,4 @@
     </div>
   </div>
 </div>
-<dialog id='log-form-dialog'>
-  <div hx-get='/log/' hx-trigger='load'></div>
-  <button id='close-log-form'>Close</button>
-</dialog>
 {% endblock %}

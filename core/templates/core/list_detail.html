@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block body %}
+<h1>{{ object.name }}</h1>
+{% for restaurantitem in object.restaurantitem_set.all %}
+<p>
+  <a href='{% url "core:restaurant_detail" slug=restaurantitem.restaurant.slug %}'>{{ restaurantitem.restaurant.name }}</a>
+  {{ restaurantitem.note }}
+</p>
+{% endfor %}
+{% if user == object.user %}
+<a href='{% url "core:list_edit" username=object.user slug=object.slug %}'>edit list</a>
+{% endif %}
+{% endblock %}

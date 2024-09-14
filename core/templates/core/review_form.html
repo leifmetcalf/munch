@@ -1,5 +1,0 @@
-<form id="log-form">
-  {% csrf_token %}
-  {{ form }}
-  <button id='submit-log' hx-post='/log/' hx-target='#log-form' hx-swap='outerHTML'>Submit</button>
-</form>

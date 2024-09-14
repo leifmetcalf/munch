@@ -1,0 +1,7 @@
+{% extends "core/base.html" %}
+
+{% block body %}
+{% for list in object_list %}
+<p><a href='{% url "core:list_detail" username=list.user.username slug=list.slug %}'>{{ list.name }}</a> by {{ list.user }}</p>
+{% endfor %}
+{% endblock %}
