@@ -1,12 +1,12 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
+from django.forms import ModelForm, inlineformset_factory, Form
 from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.shortcuts import render
 from django.utils.text import slugify
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
@@ -16,7 +16,8 @@ from django.db import transaction
 
 from datetime import date
 
-from .models import User, Restaurant, Review, Log, Gourmand, InviteCode, List, RestaurantItem, TextItem
+from .models import User, Restaurant, Review, Log, Gourmand, InviteCode, List, ListItem
+
 
 class IndexView(TemplateView):
     template_name = 'core/index.html'
@@ -103,6 +104,8 @@ class LogDetailView(DetailView):
 
 class ListDetailView(DetailView):
     model = List
+    def get_queryset(self):
+        return self.model.objects.filter(user__username=self.kwargs.get('username'))
 
 class NewListView(LoginRequiredMixin, CreateView):
     model = List
@@ -120,22 +123,61 @@ class NewListDoneView(TemplateView):
 class LogEditView(FormView):
     pass
 
-class ListEditView(FormView):
-    pass
+class ListItemForm(ModelForm):
+    class Meta:
+        model = ListItem
+        fields = ["item_type", "restaurant_restaurant", "restaurant_note", "text_text"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["restaurant_restaurant"].required = False
+        self.fields["restaurant_note"].required = False
+        self.fields["text_text"].required = False
+        print('hi')
+    def clean(self):
+        cleaned_data = super().clean()
+        item_type = cleaned_data.get('item_type')
+        if item_type == 'restaurant':
+            if not cleaned_data.get('restaurant_restaurant'):
+                self.add_error('restaurant_restaurant', "Please enter a restaurant.")
+        return cleaned_data
+
+list_item_formset = 
+
+def list_edit_item_partial(request, username, slug):
+    list_ = List.objects.get(user__username=username, slug=slug)
+    ListItemFormSet = inlineformset_factory(
+        List,
+        ListItem,
+        form=ListItemForm,
+        fields=["item_type", "restaurant_restaurant", "restaurant_note", "text_text"],
+        can_delete=True,
+        can_order=True,
+        extra=1,
+        max_num=1
+    )
+
+def list_edit(request, username, slug):
+    list_ = List.objects.get(user__username=username, slug=slug)
+    ListItemFormSet = inlineformset_factory(
+        List,
+        ListItem,
+        form=ListItemForm,
+        fields=["item_type", "restaurant_restaurant", "restaurant_note", "text_text"],
+        can_delete=True,
+        can_order=True,
+        extra=1,
+        max_num=1
+    )
+    if request.method == "POST":
+        formset = ListItemFormSet(request.POST, instance=list_)
+        if formset.is_valid():
+            formset.save()
+            return HttpResponseRedirect(reverse("core:list_edit", args=[username, slug]))
+    else:
+        formset = ListItemFormSet(instance=list_)
+    return render(request, "core/list_edit.html", {"formset": formset})
 
 class ReviewEditView(FormView):
-    pass
-
-class NewRestaurantItemView(CreateView):
-    model = RestaurantItem
-
-class NewRestaurantItemDoneView(TemplateView):
-    pass
-
-class NewTextItemView(CreateView):
-    model = TextItem
-
-class NewTextItemDoneView(TemplateView):
     pass
 
 class UserDetailView(DetailView):

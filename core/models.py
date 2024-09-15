@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 class User(AbstractUser):
     pass
@@ -48,10 +50,11 @@ class List(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-class RestaurantItem(models.Model):
+class ListItem(models.Model):
     parent = models.ForeignKey(List, on_delete=models.CASCADE)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    note = models.TextField(max_length=1000)
-
-class TextItem(models.Model):
-    text = models.TextField(max_length=1000)
+    item_type = models.CharField(
+        max_length=10, choices=[("RESTAURANT", "Restaurant"), ("TEXT", "Text")]
+    )
+    restaurant_restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, null=True, blank=True)
+    restaurant_note = models.TextField(max_length=1000, null=True, blank=True)
+    text_text = models.TextField(max_length=1000, null=True, blank=True)

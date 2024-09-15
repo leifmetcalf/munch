@@ -27,5 +27,5 @@ urlpatterns = [
     path('user/<username>/review/<slug:slug>/edit/', views.ReviewEditView.as_view(), name='review_edit'),
     path('user/<username>/lists/', views.UserListsView.as_view(), name='user_lists'),
     path('user/<username>/list/<slug:slug>/', views.ListDetailView.as_view(), name='list_detail'),
-    path('user/<username>/list/<slug:slug>/edit/', views.ListEditView.as_view(), name='list_edit'),
+    path('user/<username>/list/<slug:slug>/edit/', views.list_edit, name='list_edit'),
 ]
