@@ -19,12 +19,13 @@ urlpatterns = [
         name="restaurant_detail",
     ),
     path("lists/", views.ListsView.as_view(), name="lists"),
+    path("lists/new/", views.ListCreateView.as_view(), name="create_list"),
     path("account/create/", views.NewUserView.as_view(), name="new_user"),
     path("account/create/done/", views.NewUserDoneView.as_view(), name="new_user_done"),
     path("account/", include("django.contrib.auth.urls")),
     path("logs/new/", views.NewLogView.as_view(), name="new_log"),
     path("logs/new/done/", views.NewLogDoneView.as_view(), name="new_log_done"),
-    path("lists/new/", views.ListEditView.as_view(), name="new_list"),
+    path("lists/new/", views.ListCreateView.as_view(), name="new_list"),
     path("user/<username>/", views.UserDetailView.as_view(), name="user_detail"),
     path("user/<username>/logs/", views.UserLogsView.as_view(), name="user_logs"),
     path(
@@ -58,17 +59,22 @@ urlpatterns = [
     ),
     path(
         "user/<username>/list/<slug:slug>/edit/",
-        views.ListEditView.as_view(),
+        views.ListUpdateView.as_view(),
         name="list_edit",
     ),
     path(
-        "htmx/restaurant_item/<int:pk>/",
-        views.HtmxRestaurantItemView.as_view(),
-        name="htmx_update_restaurant_item",
+        "htmx/restaurant_item/<int:pk>/<int:list_item_pk>/",
+        views.HtmxRestaurantItemUpdateView.as_view(),
+        name="htmx_edit_restaurant_item",
     ),
     path(
         "htmx/restaurant_item/",
-        views.HtmxRestaurantItemView.as_view(),
+        views.HtmxRestaurantItemCreateView.as_view(),
+        name="htmx_new_restaurant_item",
+    ),
+    path(
+        "htmx/restaurant_item/<int:list_pk>/",
+        views.HtmxRestaurantItemCreateView.as_view(),
         name="htmx_new_restaurant_item",
     ),
 ]

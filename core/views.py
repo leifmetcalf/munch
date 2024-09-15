@@ -149,40 +149,21 @@ class LogEditView(FormView):
     pass
 
 
-class NewTextItemView(CreateView):
-    model = TextItem
-    fields = ["text"]
-
-    def form_valid(self, form):
-        try:
-            list_ = List.objects.get(
-                user__username=self.kwargs.get("username"), slug=self.kwargs.get("slug")
-            )
-            form.instance.parent = list_
-            return super().form_valid(form)
-        except List.DoesNotExist:
-            pass
-
-
-class HtmxRestaurantItemView(UpdateView):
+class HtmxRestaurantItemMixin:
     model = RestaurantItem
     fields = ["restaurant", "note"]
-    template_name = "core/htmx_restaurant_item.html"
-
-    def get_object(self, queryset=None):
-        try:
-            return super().get_object(queryset)
-        except AttributeError:
-            pass
+    template_name = "core/htmx_restaurant_item_form.html"
+    path_name = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        args = []
         try:
-            context["path"] = reverse(
-                "core:htmx_update_restaurant_item", args=[self.object.parent.pk]
-            )
+            args.prepend(self.object.parent.pk)
         except AttributeError:
-            context["path"] = reverse("core:htmx_new_restaurant_item")
+            pass
+        print("hey!")
+        context["path"] = reverse(f"core:{self.path_name}", args=args)
         return context
 
     def form_valid(self, form):
@@ -194,32 +175,29 @@ class HtmxRestaurantItemView(UpdateView):
             return self.form_invalid(form)
 
 
-class ListEditView(UpdateView):
+class HtmxRestaurantItemCreateView(HtmxRestaurantItemMixin, CreateView):
+    path_name = "htmx_new_restaurant_item"
+
+
+class HtmxRestaurantItemUpdateView(HtmxRestaurantItemMixin, UpdateView):
+    path_name = "htmx_edit_restaurant_item"
+
+    def form_valid(self, form):
+        try:
+            list_ = List.objects.get(pk=self.kwargs.get("pk"))
+            form.instance.parent = list_
+            return super().form_valid(form)
+        except List.DoesNotExist:
+            return self.form_invalid(form)
+
+
+class ListMixin:
     model = List
     fields = ["name"]
     template_name = "core/list_edit.html"
 
     def get_queryset(self):
         return self.model.objects.filter(user__username=self.kwargs.get("username"))
-
-    def get_object(self, queryset=None):
-        try:
-            return super().get_object(queryset)
-        except AttributeError:
-            pass
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        try:
-            context["item_paths"] = [
-                reverse("core:htmx_update_restaurant_item", args=[pk])
-                for pk in RestaurantItem.objects.filter(parent=self.object).values_list(
-                    "pk", flat=True
-                )
-            ]
-        except AttributeError:
-            pass
-        return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -231,6 +209,23 @@ class ListEditView(UpdateView):
             "core:list_detail",
             args=[self.request.user.get_username(), self.object.slug],
         )
+
+
+class ListCreateView(ListMixin, CreateView):
+    pass
+
+
+class ListUpdateView(ListMixin, UpdateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(self.object.__dict__)
+        context["item_paths"] = [
+            reverse("core:htmx_edit_restaurant_item", args=[self.object.pk, pk])
+            for pk in RestaurantItem.objects.filter(parent=self.object).values_list(
+                "pk", flat=True
+            )
+        ]
+        return context
 
 
 class ReviewEditView(FormView):
