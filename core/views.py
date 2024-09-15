@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, inlineformset_factory, Form
+from django.forms import ModelForm, inlineformset_factory, Form, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.shortcuts import render
@@ -155,36 +155,8 @@ class LogEditView(FormView):
 class ListItemForm(ModelForm):
     class Meta:
         model = ListItem
-        fields = ["item_type", "restaurant_restaurant", "restaurant_note", "text_text"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["restaurant_restaurant"].required = False
-        self.fields["restaurant_note"].required = False
-        self.fields["text_text"].required = False
-        print("hi")
-
-    def clean(self):
-        cleaned_data = super().clean()
-        item_type = cleaned_data.get("item_type")
-        if item_type == "restaurant":
-            if not cleaned_data.get("restaurant_restaurant"):
-                self.add_error("restaurant_restaurant", "Please enter a restaurant.")
-        return cleaned_data
-
-
-def list_edit_item_partial(request, username, slug):
-    list_ = List.objects.get(user__username=username, slug=slug)
-    ListItemFormSet = inlineformset_factory(
-        List,
-        ListItem,
-        form=ListItemForm,
-        fields=["item_type", "restaurant_restaurant", "restaurant_note", "text_text"],
-        can_delete=True,
-        can_order=True,
-        extra=1,
-        max_num=1,
-    )
+        fields = ["parent", "restaurant", "note"]
+        widgets = {"parent": HiddenInput()}
 
 
 def list_edit(request, username, slug):
@@ -193,7 +165,7 @@ def list_edit(request, username, slug):
         List,
         ListItem,
         form=ListItemForm,
-        fields=["item_type", "restaurant_restaurant", "restaurant_note", "text_text"],
+        fields=["restaurant", "note"],
         can_delete=True,
         can_order=True,
         extra=1,
