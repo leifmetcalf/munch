@@ -168,8 +168,7 @@ def list_edit(request, username, slug):
         fields=["restaurant", "note"],
         can_delete=True,
         can_order=True,
-        extra=1,
-        max_num=1,
+        extra=0,
     )
     if request.method == "POST":
         formset = ListItemFormSet(request.POST, instance=list_)

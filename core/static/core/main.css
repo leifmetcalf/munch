@@ -53,3 +53,7 @@ h1 {
   font-family: monospace;
   font-size: 1.3em;
 }
+
+.listitem-form:has(input[name$="-DELETE"]:checked) {
+    display: none;
+}

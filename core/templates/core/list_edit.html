@@ -1,17 +1,28 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block head %}
+<script src='{% static "core/list_edit.js" %}' defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+{% endblock %}
 
 {% block body %}
-
-<form method="post">
+<form id="listitem-formset" method="post">
   {% csrf_token %}
   {{ formset.management_form }}
-  {% for form in formset %}
-    {{ form }}
-  {% endfor %}
+  <div id="listitem-forms">
+    {% for form in formset %}
+      <div class="listitem-form">
+        {{ form }}
+      </div>
+    {% endfor %}
+  </div>
+  <button type="button" id="add-listitem">Add Restaurant</button>
   <button type='submit'>Submit</button>
 </form>
-
-<!--
-  <button hx-get='' hx-target='#list-items' hx-swap='beforeend'>Add restaurant</button>
--->
+<template id='empty-form'>
+  <div class="listitem-form">
+    {{ formset.empty_form }}
+  </div>
+</template>
 {% endblock %}

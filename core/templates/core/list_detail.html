@@ -2,10 +2,10 @@
 
 {% block body %}
 <h1>{{ object.name }}</h1>
-{% for restaurantitem in object.restaurantitem_set.all %}
+{% for listitem in object.listitem_set.all %}
 <p>
-  <a href='{% url "core:restaurant_detail" slug=restaurantitem.restaurant.slug %}'>{{ restaurantitem.restaurant.name }}</a>
-  {{ restaurantitem.note }}
+  <a href='{% url "core:restaurant_detail" slug=listitem.restaurant.slug %}'>{{ listitem.restaurant.name }}</a>
+  {{ listitem.note }}
 </p>
 {% endfor %}
 {% if user == object.user %}
