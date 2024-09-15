@@ -4,14 +4,16 @@
 
 <form method="post">
   {% csrf_token %}
-  {{ formset.management_form }}
-  {% for form in formset %}
-    {{ form }}
-  {% endfor %}
-  <button type='submit'>Submit</button>
+  {{ form }}
+  <button type='submit'>Save name</button>
 </form>
 
-<!--
-  <button hx-get='' hx-target='#list-items' hx-swap='beforeend'>Add restaurant</button>
--->
+<div id='list-items'>
+  {% for item_path in item_paths %}
+    <div hx-get='{{item_path}}' hx-trigger='load' hx-target='this' hx-swap='outerHTML'></div>
+  {% endfor %}
+</div>
+
+<button hx-get='/htmx/restaurant_item/{{object.id}}/' hx-target='#list-items' hx-swap='beforeend'>Add restaurant</button>
+
 {% endblock %}
