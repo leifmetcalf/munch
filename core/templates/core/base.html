@@ -12,6 +12,9 @@
     {% block head %}{% endblock %}
   </head>
   <body>
+    <header>
+      <a href="{% url 'core:index' %}"><h1>munchie.online</h1></a>
+    </header>
     {% block body %}{% endblock %}
   </body>
 </html>

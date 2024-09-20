@@ -1,8 +1,7 @@
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django_countries.fields import CountryField
 
 
 class User(AbstractUser):
@@ -16,9 +15,10 @@ class Gourmand(models.Model):
     inviter = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, related_name="invitees"
     )
+    country = CountryField()
 
     def __str__(self):
-        return f"{self.user}"
+        return f"{self.user} {self.country}"
 
 
 class InviteCode(models.Model):
@@ -31,38 +31,21 @@ class InviteCode(models.Model):
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField()
-    link_google_maps = models.URLField(null=True)
-    notes = models.TextField(max_length=1000, blank=True)
+    address = models.CharField(max_length=200)
+    google_maps_place_id = models.CharField(max_length=32, null=True)
+    note = models.TextField(max_length=1000, blank=True)
 
     def __str__(self):
         return f"{self.name}"
 
 
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    text = models.TextField(max_length=1000, blank=True)
-    favourite = models.BooleanField()
-
-    def __str__(self):
-        return f"{self.restaurant} {self.text} {self.favourite}"
-
-
-class Log(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    date = models.DateField()
-    notes = models.TextField(max_length=1000)
-
-    def __str__(self):
-        return f"{self.restaurant} {self.date} {self.notes}"
-
-
 class List(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     slug = models.SlugField()
+
+    class Meta:
+        unique_together = ["name", "slug"]
 
     def __str__(self):
         return f"{self.name}"
@@ -70,5 +53,9 @@ class List(models.Model):
 
 class ListItem(models.Model):
     parent = models.ForeignKey(List, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     note = models.TextField(max_length=1000, blank=True)
+
+    def __str__(self):
+        return f"{self.restaurant}"

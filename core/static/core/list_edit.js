@@ -3,12 +3,12 @@ const formset = document.getElementById('listitem-forms');
 const template = document.getElementById('empty-form');
 const totalFormsInput = document.getElementById('id_listitem_set-TOTAL_FORMS');
 
-// Function to update ORDER fields after sorting
+// Function to update order fields after sorting
 const updateOrder = () => {
     let visibleIndex = 1;
     [...formset.children].forEach(form => {
         if (window.getComputedStyle(form).display !== 'none') {
-            form.querySelector('input[name$="-ORDER"]').value = visibleIndex++;
+            form.querySelector('input[name$="-order"]').value = visibleIndex++;
         }
     });
 };
@@ -22,7 +22,7 @@ addButton.addEventListener('click', () => {
     const formCount = parseInt(totalFormsInput.value);
     const newForm = template.content.cloneNode(true);
 
-    [...newForm.children].forEach(element => {
+    newForm.querySelectorAll('*').forEach(element => {
         for (const attr of element.attributes) {
             element.setAttribute(
                 attr.name,

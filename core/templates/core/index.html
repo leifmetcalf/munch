@@ -9,48 +9,21 @@
 {% endblock %}
 
 {% block body %}
-<div id='body'>
-  <div id='header'>
-    <h1 id='title'>munchie.online</h1>
-  </div>
-  <div id='left'>
-    <div id='auth'>
-      {% if user.is_authenticated %}
-      <p>Logged in as {{user}}</p>
-      <form method='post' action='{% url "core:logout" %}'>
-        {% csrf_token %}
-        <button type='submit'>logout</button>
-      </form>
-      <a href='{% url "core:user_detail" username=user.username %}'>profile</a>
-      {% else %}
-      <p><a href='{% url "core:login" %}'>login</a></p>
-      <p><a href='{% url "core:new_user" %}'>create account</a></p>
-      {% endif %}
-    </div>
-    <div>search: ________________</div>
-    <a href='{% url "core:lists" %}'>lists</a>
-    <a href='{% url "core:new_log" %}'>LOG A FEED</a>
-    <a href='{% url "core:new_list" %}'>CREATE A LIST</a>
-    <a href='{% url "core:new_restaurant" %}'>Add a restaurant</a>
-  </div>
-  <div id='content'>
-  </div>
-  <div id='right'>
-    <h1>Restaurants</h1>
-    <div id='restaurants'>
-      {% for restaurant in restaurants %}
-        <p>{{ restaurant.name }}</p>
-      {% endfor %}
-    </div>
-    <h1>Latest reviews</h1>
-    <div id='reviews'>
-      {% for review in new_reviews %}
-      <div class='review'>
-        <p>{{ review.restaurant.name }}</p>
-        <p>{{ review.text }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
+<div id='auth'>
+  {% if user.is_authenticated %}
+  <p>Logged in as {{user}}</p>
+  <form method='post' action='{% url "core:logout" %}'>
+    {% csrf_token %}
+    <button type='submit'>logout</button>
+  </form>
+  <p><a href='{% url "core:user_detail" username=user.username %}'>profile</a></p>
+  {% else %}
+  <p><a href='{% url "core:login" %}'>login</a></p>
+  <p><a href='{% url "core:user_new" %}'>create account</a></p>
+  {% endif %}
 </div>
+<p><a href='{% url "core:lists" %}'>lists</a></p>
+<p><a href='{% url "core:list_new" %}'>CREATE A LIST</a></p>
+<p><a href='{% url "core:restaurant_new" %}'>Add a restaurant</a></p>
+<p><a href='{% url "core:restaurants" %}'>restaurants</a></p>
 {% endblock %}

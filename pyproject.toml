@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "munch"
+version = "2024.9.0"
+dependencies = [
+  "django>=5.1"
+]
+requires-python = ">=3.12"
+authors = [
+  {name = "Leif Metcalf", email = "me@leif.nz"},
+]
+maintainers = [
+  {name = "Leif Metcalf", email = "me@leif.nz"}
+]

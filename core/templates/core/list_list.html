@@ -2,6 +2,6 @@
 
 {% block body %}
 {% for list in object_list %}
-<p><a href='{% url "core:list_detail" username=list.user.username slug=list.slug %}'>{{ list.name }}</a> by {{ list.user }}</p>
+<p><a href='{% url "core:list_detail" username=list.author.username slug=list.slug %}'>{{ list.name }}</a> by {{ list.author }}</p>
 {% endfor %}
 {% endblock %}

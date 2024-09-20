@@ -9,6 +9,7 @@
 {% block body %}
 <form id="listitem-formset" method="post">
   {% csrf_token %}
+  {{ form }}
   {{ formset.management_form }}
   <div id="listitem-forms">
     {% for form in formset %}

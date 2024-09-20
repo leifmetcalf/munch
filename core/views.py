@@ -1,45 +1,32 @@
+from django.conf import settings
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, inlineformset_factory, Form, HiddenInput
-from django.http import HttpResponse, HttpResponseRedirect
+from django.forms import (
+    ModelForm,
+    inlineformset_factory,
+)
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
-from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 from django.db import transaction
+from django_countries.fields import CountryField
 
-from datetime import date
 
-from .models import User, Restaurant, Review, Log, Gourmand, InviteCode, List, ListItem
+from .models import User, Restaurant, Gourmand, InviteCode, List, ListItem
 
 
 class IndexView(TemplateView):
     template_name = "core/index.html"
 
 
-class NewLogView(LoginRequiredMixin, CreateView):
-    model = Log
-    fields = ["restaurant", "date", "notes"]
-    success_url = reverse_lazy("core:new_log_done")
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["user"] = self.request.user
-        initial["date"] = date.today()
-        return initial
-
-
-class NewLogDoneView(TemplateView):
-    template_name = "core/log_done.html"
-
-
 class UserCreationByInviteForm(UserCreationForm):
+    country = CountryField().formfield()
     invite_code = forms.CharField()
 
     class Meta(UserCreationForm.Meta):
@@ -60,130 +47,128 @@ class UserCreationByInviteForm(UserCreationForm):
         with transaction.atomic():
             user = super().save(commit)
             data = self.cleaned_data["invite_code"]
-            gourmand = Gourmand(user=user, inviter=data.inviter)
+            gourmand = Gourmand(
+                user=user, inviter=data.inviter, country=self.cleaned_data["country"]
+            )
             if commit:
                 gourmand.save()
                 data.delete()
 
 
-class NewUserView(FormView):
-    template_name = "core/user_creation.html"
-    form_class = UserCreationByInviteForm
-    success_url = reverse_lazy("core:new_user_done")
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-
-class NewUserDoneView(TemplateView):
-    template_name = "core/user_creation_done.html"
+def register(request):
+    if request.method == "POST":
+        form = UserCreationByInviteForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            new_user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password1"],
+            )
+            login(request, new_user)
+            return redirect("core:index")
+    else:
+        form = UserCreationByInviteForm()
+    return render(request, "core/user_creation.html", {"form": form})
 
 
 class ListsView(ListView):
     model = List
 
 
-class UserReviewsView(ListView):
-    model = Review
-
-
-class ReviewDetailView(DetailView):
-    model = Review
-
-
-class NewReviewView(CreateView):
-    model = Review
-
-
-class NewReviewDoneView(TemplateView):
-    pass
-
-
 class RestaurantDetailView(DetailView):
     model = Restaurant
 
 
-class NewRestaurantView(CreateView):
-    pass
+def restaurants(request):
+    restaurants = Restaurant.objects.all()
+    return render(request, "core/restaurants.html", {"restaurants": restaurants})
+
+
+def restaurant_new(request):
+    if request.method == "POST":
+        form = RestaurantForm(request.POST)
+        if form.is_valid():
+            restaurant = form.save()
+            return redirect("core:restaurant_detail", pk=restaurant.pk)
+    else:
+        form = RestaurantForm()
+
+    return render(
+        request,
+        "core/restaurant_new.html",
+        {
+            "form": form,
+            "google_maps_api_key": settings.GOOGLE_MAPS_API_KEY,
+        },
+    )
+
+
+class RestaurantForm(forms.ModelForm):
+    class Meta:
+        model = Restaurant
+        fields = ["name", "address", "google_maps_place_id", "note"]
 
 
 class NewRestaurantDoneView(TemplateView):
     pass
 
 
-class UserLogsView(ListView):
-    pass
-
-
-class UserListsView(ListView):
-    pass
-
-
-class LogDetailView(DetailView):
-    model = Log
-
-
 class ListDetailView(DetailView):
     model = List
 
     def get_queryset(self):
-        return self.model.objects.filter(user__username=self.kwargs.get("username"))
+        return self.model.objects.filter(author__username=self.kwargs.get("username"))
 
 
-class NewListView(LoginRequiredMixin, CreateView):
-    model = List
-    fields = ["name"]
+class ListForm(ModelForm):
+    class Meta:
+        model = List
+        fields = ["name"]
 
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.user = self.request.user
-        obj.slug = slugify(obj.name)
-        return super().form_valid(form)
-
-    success_url = reverse_lazy("core:new_list_done")
-
-
-class NewListDoneView(TemplateView):
-    template_name = "core/new_list_done.html"
-
-
-class LogEditView(FormView):
-    pass
+    def save(self, commit=True):
+        self.instance.slug = slugify(self.instance.name)
+        return super().save(commit)
 
 
 class ListItemForm(ModelForm):
     class Meta:
         model = ListItem
-        fields = ["parent", "restaurant", "note"]
-        widgets = {"parent": HiddenInput()}
+        fields = ["restaurant", "note", "order"]
 
 
-def list_edit(request, username, slug):
-    list_ = List.objects.get(user__username=username, slug=slug)
+@login_required
+def list_edit(request, username=None, slug=None):
+    user = (
+        request.user if username is None else get_object_or_404(User, username=username)
+    )
+    if request.user != user:
+        return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+    list_ = None if slug is None else get_object_or_404(List, author=user, slug=slug)
     ListItemFormSet = inlineformset_factory(
         List,
         ListItem,
         form=ListItemForm,
-        fields=["restaurant", "note"],
         can_delete=True,
-        can_order=True,
         extra=0,
     )
     if request.method == "POST":
-        formset = ListItemFormSet(request.POST, instance=list_)
-        if formset.is_valid():
-            formset.save()
-            return HttpResponseRedirect(
-                reverse("core:list_edit", args=[username, slug])
+        form = ListForm(request.POST, instance=list_)
+        formset = ListItemFormSet(request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
+            # If the list is new, set the form's author to the current user
+            if list_ is None:
+                form.instance.author = request.user
+            with transaction.atomic():
+                form.save()
+                formset.save()
+            return redirect(
+                "core:list_detail", form.instance.author.username, form.instance.slug
             )
     else:
-        formset = ListItemFormSet(instance=list_)
-    return render(request, "core/list_edit.html", {"formset": formset})
-
-
-class ReviewEditView(FormView):
-    pass
+        form = ListForm(instance=list_)
+        formset = ListItemFormSet(instance=form.instance)
+    context = {"form": form, "formset": formset}
+    return render(request, "core/list_edit.html", context)
 
 
 class UserDetailView(DetailView):

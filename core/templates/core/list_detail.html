@@ -2,13 +2,13 @@
 
 {% block body %}
 <h1>{{ object.name }}</h1>
-{% for listitem in object.listitem_set.all %}
+{% for listitem in object.listitem_set.all|dictsort:"order" %}
 <p>
-  <a href='{% url "core:restaurant_detail" slug=listitem.restaurant.slug %}'>{{ listitem.restaurant.name }}</a>
+  <a href='{% url "core:restaurant_detail" pk=listitem.restaurant.pk %}'>{{ listitem.restaurant.name }}</a>
   {{ listitem.note }}
 </p>
 {% endfor %}
-{% if user == object.user %}
-<a href='{% url "core:list_edit" username=object.user slug=object.slug %}'>edit list</a>
+{% if user == object.author %}
+<a href='{% url "core:list_edit" username=object.author slug=object.slug %}'>edit list</a>
 {% endif %}
 {% endblock %}
