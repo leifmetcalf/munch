@@ -7,4 +7,5 @@
     <li><a href='{% url "core:restaurant_detail" pk=restaurant.pk %}'>{{ restaurant.name }}</a></li>
     {% endfor %}
 </ul>
+<a href='{% url "core:restaurant_new" %}'>Add Restaurant</a>
 {% endblock %}

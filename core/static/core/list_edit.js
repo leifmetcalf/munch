@@ -8,7 +8,7 @@ const updateOrder = () => {
     let visibleIndex = 1;
     [...formset.children].forEach(form => {
         if (window.getComputedStyle(form).display !== 'none') {
-            form.querySelector('input[name$="-order"]').value = visibleIndex++;
+            form.querySelector('input[name$="-ORDER"]').value = visibleIndex++;
         }
     });
 };

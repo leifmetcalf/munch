@@ -7,16 +7,12 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
-    path("restaurants/", views.restaurants, name="restaurants"),
-    path("restaurants/new/", views.restaurant_new, name="restaurant_new"),
-    path(
-        "restaurant/<int:pk>/",
-        views.RestaurantDetailView.as_view(),
-        name="restaurant_detail",
-    ),
-    path("lists/", views.ListsView.as_view(), name="lists"),
     path("account/create/", views.register, name="user_new"),
     path("account/", include("django.contrib.auth.urls")),
+    path("restaurants/", views.restaurants, name="restaurants"),
+    path("restaurants/new/", views.restaurant_new, name="restaurant_new"),
+    path("restaurant/<int:pk>/", views.restaurant_detail, name="restaurant_detail"),
+    path("lists/", views.ListsView.as_view(), name="lists"),
     path("lists/new/", views.list_edit, name="list_new"),
     path("user/<username>/", views.UserDetailView.as_view(), name="user_detail"),
     path(

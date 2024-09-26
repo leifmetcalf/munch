@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.forms import (
+    BaseInlineFormSet,
     ModelForm,
     inlineformset_factory,
 )
@@ -75,8 +76,14 @@ class ListsView(ListView):
     model = List
 
 
-class RestaurantDetailView(DetailView):
-    model = Restaurant
+def restaurant_detail(request, pk):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    lists = List.objects.filter(listitem__restaurant=restaurant).distinct()
+    context = {
+        "object": restaurant,
+        "lists": lists,
+    }
+    return render(request, "core/restaurant_detail.html", context)
 
 
 def restaurants(request):
@@ -133,7 +140,17 @@ class ListForm(ModelForm):
 class ListItemForm(ModelForm):
     class Meta:
         model = ListItem
-        fields = ["restaurant", "note", "order"]
+        fields = ["restaurant", "note"]
+
+    def save(self, commit=True):
+        self.instance.order = self.cleaned_data["ORDER"]
+        return super().save(commit)
+
+
+class ListItemBaseFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.queryset.order_by("order")
 
 
 @login_required
@@ -148,6 +165,8 @@ def list_edit(request, username=None, slug=None):
         List,
         ListItem,
         form=ListItemForm,
+        formset=ListItemBaseFormSet,
+        can_order=True,
         can_delete=True,
         extra=0,
     )
@@ -172,4 +191,6 @@ def list_edit(request, username=None, slug=None):
 
 
 class UserDetailView(DetailView):
-    pass
+    model = Gourmand
+    slug_field = "user__username"
+    slug_url_kwarg = "username"
