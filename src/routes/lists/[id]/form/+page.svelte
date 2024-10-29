@@ -6,7 +6,13 @@
     let restaurant_results: Restaurant[] = $state([]);
 
     function addItem(restaurant: Restaurant) {
-        items.push({ id: crypto.randomUUID(), list_id: data.list.id, restaurant_id: restaurant.id, restaurant, position: items.length });
+        items.push({
+            id: crypto.randomUUID(),
+            list_id: data.list.id,
+            restaurant_id: restaurant.id,
+            restaurant,
+            position: items.length
+        });
     }
 
     function removeItem(item: Item) {
@@ -22,6 +28,7 @@
 <h1>Edit {data.list.name}</h1>
 <form method="POST" action="?/create">
     <div>
+        <input type="hidden" id="id" name="id" value={data.list.id} />
         <label for="name">Name</label>
         <input type="text" id="name" name="name" value={data.list.name} />
     </div>

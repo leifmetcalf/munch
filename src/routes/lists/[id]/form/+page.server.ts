@@ -1,28 +1,25 @@
 import { formDataToObject } from "$lib/utils";
 import { getList, saveList, ListWithItems } from "$lib/lists";
-import type { ListWithRestaurants } from "$lib/lists";
 import { redirect } from "@sveltejs/kit";
 
 export async function load({ params }) {
     return {
-        list: await getList(params.id) as ListWithRestaurants
+        list: await getList(params.id)
     };
 }
 
 export const actions = {
-    create: async ({ request, params }) => {
+    create: async ({ request }) => {
         const formData = await request.formData();
-        const { name, items } = formDataToObject(formData) as
-            { name: string, items: Record<string, { id: string, restaurant_id: string }> };
-        const list_id = params.id;
+        const { items, ...rest } = formDataToObject(formData) as
+            { id: string, name: string, items: Record<string, { id: string, restaurant_id: string }> };
         const list = ListWithItems.parse(
             {
-                id: list_id,
-                name,
-                items: (Object.entries(items)).map(([index, item]) => ({ ...item, list_id, position: parseInt(index) }))
+                ...rest,
+                items: (Object.entries(items)).map(([index, item]) => ({ ...item, list_id: rest.id, position: parseInt(index) }))
             }
         )
         await saveList(list);
-        return redirect(303, `/lists/${list_id}`);
+        return redirect(303, `/lists/${list.id}`);
     }
 };

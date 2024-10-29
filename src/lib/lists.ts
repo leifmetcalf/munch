@@ -8,22 +8,25 @@ export const Item = z.object({
     restaurant_id: z.string(),
     position: z.number(),
 });
+export type Item = z.infer<typeof Item>;
 
 export const ItemWithRestaurant = Item.extend({
     restaurant: Restaurant,
 });
+export type ItemWithRestaurant = z.infer<typeof ItemWithRestaurant>;
 
-export type Item = z.infer<typeof Item>;
 
 export const List = z.object({
     id: z.string(),
     name: z.string(),
 });
 export type List = z.infer<typeof List>;
+
 export const ListWithItems = List.extend({
     items: z.array(Item),
 });
 export type ListWithItems = z.infer<typeof ListWithItems>;
+
 export const ListWithRestaurants = List.extend({
     items: z.array(ItemWithRestaurant),
 });

@@ -1,9 +1,61 @@
 <script lang="ts">
-    let { data } = $props();
+    import type { Restaurant } from "$lib/restaurants";
+    import type { ItemWithRestaurant, Item } from "$lib/lists";
+    let list_id = crypto.randomUUID();
+    let items: ItemWithRestaurant[] = $state([]);
+    let restaurant_results: Restaurant[] = $state([]);
+
+    function addItem(restaurant: Restaurant) {
+        items.push({
+            id: crypto.randomUUID(),
+            list_id,
+            restaurant_id: restaurant.id,
+            restaurant,
+            position: items.length
+        });
+    }
+
+    function removeItem(item: Item) {
+        items = items.filter(i => i.id !== item.id);
+    }
+
+    async function searchRestaurants(q: string) {
+        const response = await fetch(`/api/restaurants/search?q=${q}`);
+        restaurant_results = (await response.json()).restaurants;
+    }
 </script>
 
 <h1>New List</h1>
-<form method="POST" action="?/save">
-    <input type="text" name="name" />
-    <button type="submit">Create</button>
+<form method="POST" action="?/create">
+    <div>
+        <input type="hidden" id="id" name="id" value={list_id} />
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" />
+    </div>
+    {#each items as item, index}
+        <div>
+            <input type="hidden" id={`items.${index}.id`} name={`items.${index}.id`} value={item.id} />
+            <div>
+                <label for={`items.${index}.restaurant_id`}>{item.restaurant.name}</label>
+                <input type="hidden" id={`items.${index}.restaurant_id`} name={`items.${index}.restaurant_id`} value={item.restaurant.id} />
+            </div>
+            <button type="button" onclick={() => removeItem(item)}>Remove</button>
+        </div>
+    {/each}
+    <button type="submit">Save</button>
 </form>
+
+<input
+    type="text"
+    name="restaurant_search"
+    oninput={(e: Event) =>
+        searchRestaurants((e.target as HTMLInputElement).value)
+    }
+/>
+{#each restaurant_results as restaurant}
+    <p>
+        <button type="button" onclick={() => addItem(restaurant)}>
+            {restaurant.name}
+        </button>
+    </p>
+{/each}
