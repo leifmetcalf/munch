@@ -11,6 +11,7 @@ create table lists (
 
 create table items (
     id uuid primary key default gen_random_uuid(),
+    position integer not null,
     list_id uuid not null references lists(id),
     restaurant_id uuid not null references restaurants(id)
 );
@@ -29,8 +30,8 @@ insert into restaurants (name, address) values ('Mamak', '15 Goulburn St');
 
 insert into lists (name) values ('Ramen restaurants');
 
-insert into items (list_id, restaurant_id)
-select l.id, r.id
+insert into items (list_id, restaurant_id, position)
+select l.id, r.id, row_number() over () - 1 as position
 from lists l, restaurants r
 where l.name = 'Ramen restaurants'
 and r.name in ('Chaco Ramen', 'Tanpopo Ramen')

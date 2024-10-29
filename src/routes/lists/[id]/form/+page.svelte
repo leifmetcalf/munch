@@ -1,40 +1,53 @@
 <script lang="ts">
+    import type { Restaurant } from "$lib/restaurants";
+    import type { Item } from "$lib/lists";
     let { data } = $props();
-    let items = $state([...data.items]);
-    let restaurants = $state([]);
-    let restaurantSearch = $state("");
+    let items = $state([...data.list.items]);
+    let restaurant_results: Restaurant[] = $state([]);
 
-    function addItem(restaurant_id: string) {
-        items = [...items, { restaurant_id: restaurant_id }];
+    function addItem(restaurant: Restaurant) {
+        items.push({ id: crypto.randomUUID(), list_id: data.list.id, restaurant_id: restaurant.id, restaurant, position: items.length });
     }
 
-    async function searchRestaurants() {
-        const response = await fetch(
-            `/api/restaurants/search?q=${restaurantSearch}`,
-        );
-        restaurants = (await response.json()).restaurants;
+    function removeItem(item: Item) {
+        items = items.filter(i => i.id !== item.id);
     }
 
-    $effect(() => {
-        searchRestaurants();
-    });
+    async function searchRestaurants(q: string) {
+        const response = await fetch(`/api/restaurants/search?q=${q}`);
+        restaurant_results = (await response.json()).restaurants;
+    }
 </script>
 
 <h1>Edit {data.list.name}</h1>
 <form method="POST" action="?/create">
-    <p><input type="text" name="name" value={data.list.name} /></p>
-    {#each items as item}
-        <p>
-            <input type="text" name="item[]" value={item.restaurant_id} />
-        </p>
+    <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" value={data.list.name} />
+    </div>
+    {#each items as item, index}
+        <div>
+            <input type="hidden" id={`items.${index}.id`} name={`items.${index}.id`} value={item.id} />
+            <div>
+                <label for={`items.${index}.restaurant_id`}>{item.restaurant.name}</label>
+                <input type="hidden" id={`items.${index}.restaurant_id`} name={`items.${index}.restaurant_id`} value={item.restaurant.id} />
+            </div>
+            <button type="button" onclick={() => removeItem(item)}>Remove</button>
+        </div>
     {/each}
     <button type="submit">Save</button>
 </form>
 
-<input type="text" name="restaurant_search" bind:value={restaurantSearch} />
-{#each restaurants as restaurant}
+<input
+    type="text"
+    name="restaurant_search"
+    oninput={(e: Event) =>
+        searchRestaurants((e.target as HTMLInputElement).value)
+    }
+/>
+{#each restaurant_results as restaurant}
     <p>
-        <button type="button" onclick={() => addItem(restaurant.id)}>
+        <button type="button" onclick={() => addItem(restaurant)}>
             {restaurant.name}
         </button>
     </p>
