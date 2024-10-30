@@ -9,10 +9,26 @@ export const Restaurant = z.object({
 
 export type Restaurant = z.infer<typeof Restaurant>;
 
-export const searchRestaurants = async (query: string): Promise<Restaurant[]> => {
+export async function searchRestaurants(query: string): Promise<Restaurant[]> {
     return await sql`
-        select * from restaurants 
+        select id, name, address from restaurants 
         where name ilike ${`%${query}%`} 
         or address ilike ${`%${query}%`}
     `;
-};
+}
+
+export async function getRestaurants(): Promise<Restaurant[]> {
+    return await sql`select id, name, address from restaurants`;
+}
+
+export async function getRestaurant(id: string): Promise<Restaurant> {
+    const [restaurant]: [Restaurant] = await sql`select id, name, address from restaurants where id = ${id}`;
+    return restaurant;
+}
+
+export async function saveRestaurant(restaurant: Restaurant): Promise<void> {
+    await sql`
+        insert into restaurants ${sql(restaurant, 'id', 'name', 'address')}
+        on conflict (id) do update set ${sql(restaurant, 'name', 'address')}
+    `;
+}

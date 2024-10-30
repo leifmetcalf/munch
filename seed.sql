@@ -1,3 +1,14 @@
+create table users (
+    id uuid primary key default gen_random_uuid(),
+    username text not null unique
+);
+
+create table sessions (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references users(id),
+    expires_at timestamptz not null
+);
+
 create table restaurants (
     id uuid primary key default gen_random_uuid(),
     name text not null,

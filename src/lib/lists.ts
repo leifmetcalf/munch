@@ -60,6 +60,11 @@ export async function getList(id: string): Promise<ListWithRestaurants> {
     return list;
 }
 
+export async function getLists(): Promise<List[]> {
+    const lists: [List] = await sql`select * from lists`
+    return lists;
+}
+
 export async function saveList(list: ListWithItems) {
     console.log(list);
     await sql.begin(async sql => {

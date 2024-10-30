@@ -9,7 +9,7 @@ export async function load({ params }) {
 }
 
 export const actions = {
-    create: async ({ request }) => {
+    update: async ({ request }) => {
         const formData = await request.formData();
         const { items, ...rest } = formDataToObject(formData) as
             { id: string, name: string, items: Record<string, { id: string, restaurant_id: string }> };

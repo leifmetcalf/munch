@@ -20,6 +20,8 @@
 	},
 	"dependencies": {
 		"postgres": "^3.4.5",
-		"zod": "^3.23.8"
+		"zod": "^3.23.8",
+		"sortablejs": "^1.15.3",
+		"uuid": "^11.0.2"
 	}
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { Restaurant } from "$lib/restaurants";
     import type { Item } from "$lib/lists";
+    import Sortable from "sortablejs";
     let { data } = $props();
     let items = $state([...data.list.items]);
     let restaurant_results: Restaurant[] = $state([]);
@@ -26,22 +27,24 @@
 </script>
 
 <h1>Edit {data.list.name}</h1>
-<form method="POST" action="?/create">
+<form method="POST" action="?/update">
     <div>
         <input type="hidden" id="id" name="id" value={data.list.id} />
         <label for="name">Name</label>
         <input type="text" id="name" name="name" value={data.list.name} />
     </div>
-    {#each items as item, index}
-        <div>
-            <input type="hidden" id={`items.${index}.id`} name={`items.${index}.id`} value={item.id} />
+    <div>
+        {#each items as item, index}
             <div>
-                <label for={`items.${index}.restaurant_id`}>{item.restaurant.name}</label>
-                <input type="hidden" id={`items.${index}.restaurant_id`} name={`items.${index}.restaurant_id`} value={item.restaurant.id} />
+                <input type="hidden" id={`items.${index}.id`} name={`items.${index}.id`} value={item.id} />
+                <div>
+                    <label for={`items.${index}.restaurant_id`}>{item.restaurant.name}</label>
+                    <input type="hidden" id={`items.${index}.restaurant_id`} name={`items.${index}.restaurant_id`} value={item.restaurant.id} />
             </div>
             <button type="button" onclick={() => removeItem(item)}>Remove</button>
         </div>
-    {/each}
+        {/each}
+    </div>
     <button type="submit">Save</button>
 </form>
 
