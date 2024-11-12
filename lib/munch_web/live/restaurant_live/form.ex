@@ -15,6 +15,9 @@ defmodule MunchWeb.RestaurantLive.Form do
     <.simple_form for={@form} id="restaurant-form" phx-change="validate" phx-submit="save">
       <.input field={@form[:name]} type="text" label="Name" />
       <.input field={@form[:address]} type="text" label="Address" />
+      <.input field={@form[:country]} type="text" label="Country" />
+      <.input field={@form[:city]} type="text" label="City" />
+      <.input field={@form[:neighbourhood]} type="text" label="Neighbourhood" />
       <:actions>
         <.button phx-disable-with="Saving...">Save Restaurant</.button>
       </:actions>
@@ -90,5 +93,5 @@ defmodule MunchWeb.RestaurantLive.Form do
   end
 
   defp return_path("index", _restaurant), do: ~p"/restaurants"
-  defp return_path("show", restaurant), do: ~p"/restaurants/#{restaurant}"
+  defp return_path("show", restaurant), do: ~p"/restaurant/#{restaurant}"
 end

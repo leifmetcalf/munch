@@ -16,14 +16,15 @@ defmodule Munch.Lists.Item do
   def changeset(item, attrs) do
     item
     |> cast(attrs, [:position, :list_id, :restaurant_id])
-    |> validate_required([:position, :list_id, :restaurant_id])
+    |> validate_required([:position])
+    |> assoc_constraint(:list)
+    |> assoc_constraint(:restaurant)
   end
 
   @doc false
   def changeset(item, attrs, position) do
     item
-    |> cast(attrs, [:list_id, :restaurant_id])
-    |> validate_required([:restaurant_id])
+    |> cast(attrs, [:restaurant_id])
     |> assoc_constraint(:restaurant)
     |> put_change(:position, position)
   end

@@ -1,4 +1,4 @@
-defmodule MunchWeb.UserRegistrationLive do
+defmodule MunchWeb.UserLive.Registration do
   use MunchWeb, :live_view
 
   alias Munch.Accounts

@@ -22,6 +22,10 @@ defmodule Munch.Lists do
     Repo.all(List)
   end
 
+  def user_lists(user) do
+    Repo.all(from(l in List, where: l.user_id == ^user.id))
+  end
+
   @doc """
   Gets a single list.
 
@@ -53,8 +57,8 @@ defmodule Munch.Lists do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_list(attrs \\ %{}) do
-    %List{}
+  def create_list(user, attrs \\ %{}) do
+    %List{user_id: user.id}
     |> List.changeset(attrs)
     |> Repo.insert()
   end
@@ -71,10 +75,14 @@ defmodule Munch.Lists do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_list(%List{} = list, attrs) do
-    list
-    |> List.changeset(attrs)
-    |> Repo.update()
+  def update_list(user, %List{} = list, attrs) do
+    if list.user_id == user.id do
+      list
+      |> List.changeset(attrs)
+      |> Repo.update()
+    else
+      raise Munch.NotAuthorizedError
+    end
   end
 
   @doc """
@@ -89,8 +97,12 @@ defmodule Munch.Lists do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_list(%List{} = list) do
-    Repo.delete(list)
+  def delete_list(user, %List{} = list) do
+    if list.user_id == user.id do
+      Repo.delete(list)
+    else
+      raise Munch.NotAuthorizedError
+    end
   end
 
   @doc """
@@ -109,8 +121,8 @@ defmodule Munch.Lists do
   @doc """
   Creates a changeset and prepends a restaurant to the list items.
   """
-  def change_list_prepend_restaurant(restaurant_id, %List{} = list, attrs \\ %{}) do
-    List.prepend_restaurant_changeset(list, attrs, restaurant_id)
+  def changeset_prepend_restaurant(changeset, restaurant_id) do
+    List.prepend_restaurant(changeset, restaurant_id)
   end
 
   alias Munch.Lists.Item

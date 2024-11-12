@@ -7,19 +7,29 @@ defmodule MunchWeb.ListLive.Show do
   def render(assigns) do
     ~H"""
     <.header>
-      List <%= @list.id %>
-      <:subtitle>This is a list record from your database.</:subtitle>
+      <%= @list.name %>
+      <:subtitle>Inserted <%= @list.inserted_at %></:subtitle>
       <:actions>
-        <.link navigate={~p"/lists/#{@list}/edit?return_to=show"}>
+        <.link navigate={~p"/list/#{@list}/edit?return_to=show"}>
           <.button>Edit list</.button>
         </.link>
       </:actions>
     </.header>
 
-    <.list>
-      <:item title="Name"><%= @list.name %></:item>
-      <:item title="ID"><%= @list.id %></:item>
-    </.list>
+    <h2>Details</h2>
+    <ul>
+      <li>ID: <%= @list.id %></li>
+      <li>Owner: <%= @list.user_id %></li>
+      <li>Inserted: <%= @list.inserted_at %></li>
+      <li>Updated: <%= @list.updated_at %></li>
+    </ul>
+
+    <h2>Items</h2>
+    <ul>
+      <li :for={item <- @list.items}>
+        <%= item.restaurant.name %>
+      </li>
+    </ul>
 
     <.back navigate={~p"/lists"}>Back to lists</.back>
     """

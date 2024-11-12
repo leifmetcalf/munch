@@ -24,9 +24,7 @@ defmodule Munch.Lists.List do
     )
   end
 
-  def prepend_restaurant_changeset(list, attrs, restaurant_id) do
-    changeset = changeset(list, attrs)
-
+  def prepend_restaurant(changeset, restaurant_id) do
     changeset
     |> put_assoc(:items, [
       %Munch.Lists.Item{restaurant_id: restaurant_id}

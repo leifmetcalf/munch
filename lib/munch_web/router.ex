@@ -17,27 +17,6 @@ defmodule MunchWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", MunchWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-
-    live "/restaurants", RestaurantLive.Index, :index
-    live "/restaurants/new", RestaurantLive.Form, :new
-    live "/restaurants/:id", RestaurantLive.Show, :show
-    live "/restaurants/:id/edit", RestaurantLive.Form, :edit
-
-    live "/lists", ListLive.Index, :index
-    live "/lists/new", ListLive.Form, :new
-    live "/lists/:id", ListLive.Show, :show
-    live "/lists/:id/edit", ListLive.Form, :edit
-
-    live "/list_items", ItemLive.Index, :index
-    live "/list_items/new", ItemLive.Form, :new
-    live "/list_items/:id", ItemLive.Show, :show
-    live "/list_items/:id/edit", ItemLive.Form, :edit
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", MunchWeb do
   #   pipe_through :api
@@ -60,17 +39,15 @@ defmodule MunchWeb.Router do
     end
   end
 
-  ## Authentication routes
-
   scope "/", MunchWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{MunchWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live "/users/register", UserLive.Registration, :new
+      live "/users/log_in", UserLive.Login, :new
+      live "/users/reset_password", UserLive.ForgotPassword, :new
+      live "/users/reset_password/:token", UserLive.ResetPassword, :edit
     end
 
     post "/users/log_in", UserSessionController, :create
@@ -81,20 +58,37 @@ defmodule MunchWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{MunchWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/confirm_email/:token", UserLive.Settings, :confirm_email
+      live "/users/edit", UserLive.ProfileForm, :edit
+
+      live "/restaurants/new", RestaurantLive.Form, :new
+      live "/restaurant/:id/edit", RestaurantLive.Form, :edit
+
+      live "/lists/new", ListLive.Form, :new
+      live "/list/:id/edit", ListLive.Form, :edit
     end
   end
 
   scope "/", MunchWeb do
     pipe_through [:browser]
 
+    get "/", PageController, :home
+
     delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{MunchWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live "/users/confirm/:token", UserLive.Confirmation, :edit
+      live "/users/confirm", UserLive.ConfirmationInstructions, :new
+
+      live "/restaurants", RestaurantLive.Index, :index
+      live "/restaurant/:id", RestaurantLive.Show, :show
+
+      live "/lists", ListLive.Index, :index
+      live "/list/:id", ListLive.Show, :show
+
+      live "/user/:id", UserLive.Profile, :show
     end
   end
 end

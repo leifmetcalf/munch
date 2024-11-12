@@ -19,21 +19,14 @@
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "../../../../"
-import { LiveSocket } from "phoenix_live_view"
+import { LiveSocket } from "../vendor/phoenix_live_view"
 import topbar from "../vendor/topbar"
-import Sortable from "../vendor/Sortable.min"
+import Sortable from "../vendor/Sortable"
 
 
 let Hooks = {
   SortableInputs: {
     mounted() {
-      // SortableJS triggers change events on the parent element, but LiveView errors if a
-      // change event is triggered on a non-input element, so we suppress the change event
-      // and use a proxy input element to send the change event to LiveView.
-      this.el.addEventListener('change', (e) => {
-        e.stopPropagation()
-        e.preventDefault()
-      });
       let proxy = document.createElement('input');
       proxy.type = 'hidden';
       proxy.name = 'sortable-change-proxy';
@@ -48,6 +41,14 @@ let Hooks = {
     }
   }
 }
+
+window.addEventListener("munch:show-modal", (e) => {
+  e.target.showModal()
+})
+
+window.addEventListener("munch:close-modal", (e) => {
+  e.target.close()
+})
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

@@ -18,14 +18,14 @@ defmodule MunchWeb.ListLive.Index do
     <.table
       id="lists"
       rows={@streams.lists}
-      row_click={fn {_id, list} -> JS.navigate(~p"/lists/#{list}") end}
+      row_click={fn {_id, list} -> JS.navigate(~p"/list/#{list}") end}
     >
       <:col :let={{_id, list}} label="Name"><%= list.name %></:col>
       <:action :let={{_id, list}}>
         <div class="sr-only">
-          <.link navigate={~p"/lists/#{list}"}>Show</.link>
+          <.link navigate={~p"/list/#{list}"}>Show</.link>
         </div>
-        <.link navigate={~p"/lists/#{list}/edit"}>Edit</.link>
+        <.link navigate={~p"/list/#{list}/edit"}>Edit</.link>
       </:action>
       <:action :let={{id, list}}>
         <.link
@@ -50,7 +50,7 @@ defmodule MunchWeb.ListLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     list = Lists.get_list!(id)
-    {:ok, _} = Lists.delete_list(list)
+    {:ok, _} = Lists.delete_list(socket.assigns.current_user, list)
 
     {:noreply, stream_delete(socket, :lists, list)}
   end

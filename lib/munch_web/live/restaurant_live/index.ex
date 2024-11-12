@@ -18,15 +18,15 @@ defmodule MunchWeb.RestaurantLive.Index do
     <.table
       id="restaurants"
       rows={@streams.restaurants}
-      row_click={fn {_id, restaurant} -> JS.navigate(~p"/restaurants/#{restaurant}") end}
+      row_click={fn {_id, restaurant} -> JS.navigate(~p"/restaurant/#{restaurant}") end}
     >
       <:col :let={{_id, restaurant}} label="Name"><%= restaurant.name %></:col>
       <:col :let={{_id, restaurant}} label="Address"><%= restaurant.address %></:col>
       <:action :let={{_id, restaurant}}>
         <div class="sr-only">
-          <.link navigate={~p"/restaurants/#{restaurant}"}>Show</.link>
+          <.link navigate={~p"/restaurant/#{restaurant}"}>Show</.link>
         </div>
-        <.link navigate={~p"/restaurants/#{restaurant}/edit"}>Edit</.link>
+        <.link navigate={~p"/restaurant/#{restaurant}/edit"}>Edit</.link>
       </:action>
       <:action :let={{id, restaurant}}>
         <.link

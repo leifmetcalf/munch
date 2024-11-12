@@ -12,24 +12,45 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
 
   def render(assigns) do
     ~H"""
-    <div>
-      <.simple_form
+    <div class="max-w-lg mx-auto">
+      <.form
         for={@form}
         id="restaurant-select-form"
         phx-change="validate"
-        phx-submit="save"
+        phx-submit={JS.push("save") |> @submit_action.()}
         phx-target={@myself}
       >
-        <.remote_datalist
-          field={@form[:search]}
-          label="Add a restaurant"
-          value=""
-          result_name="restaurant_id"
-          results={@restaurants}
-          new_link={~p"/restaurants/new"}
-          new_label="Add new restaurant..."
+        <input
+          type="search"
+          name={@form[:search].name}
+          id={@form[:search].id}
+          value={Phoenix.HTML.Form.normalize_value("search", @form[:search].value)}
+          class="w-full block border border-zinc-300 rounded-lg focus:border-zinc-400 focus:ring-0"
+          autocomplete="off"
+          autofocus
+          placeholder="Search for a restaurant"
         />
-      </.simple_form>
+        <ul :if={@restaurants} class="mt-4 divide-y divide-zinc-300">
+          <li :for={restaurant <- @restaurants}>
+            <button
+              name={@form[:restaurant_id].name}
+              value={restaurant.id}
+              class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
+            >
+              <%= "#{restaurant.name} (#{restaurant.address})" %>
+            </button>
+          </li>
+          <li :if={@restaurants == []}>
+            <a
+              href={~p"/restaurants/new"}
+              target="_blank"
+              class="w-full block py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
+            >
+              Add new restaurant...
+            </a>
+          </li>
+        </ul>
+      </.form>
     </div>
     """
   end
@@ -46,15 +67,17 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
 
          _ ->
            Restaurants.search_restaurants(search)
-           |> Enum.map(fn restaurant ->
-             %{value: restaurant.id, pretty: "#{restaurant.name} (#{restaurant.address})"}
-           end)
        end
      )}
   end
 
   def handle_event("save", %{"restaurant_id" => restaurant_id}, socket) do
     send(self(), {:restaurant_selected, restaurant_id})
+    {:noreply, socket |> assign(:form, to_form(%{})) |> assign(:restaurants, nil)}
+  end
+
+  def handle_event("save", params, socket) do
+    IO.inspect(params)
     {:noreply, socket}
   end
 end

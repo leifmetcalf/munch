@@ -7,6 +7,9 @@ defmodule Munch.Restaurants.Restaurant do
   schema "restaurants" do
     field :name, :string
     field :address, :string
+    field :country, :string
+    field :city, :string
+    field :neighbourhood, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +17,7 @@ defmodule Munch.Restaurants.Restaurant do
   @doc false
   def changeset(restaurant, attrs) do
     restaurant
-    |> cast(attrs, [:name, :address])
-    |> validate_required([:name, :address])
+    |> cast(attrs, [:name, :address, :country, :city, :neighbourhood])
+    |> validate_required([:name, :address, :country, :city, :neighbourhood])
   end
 end

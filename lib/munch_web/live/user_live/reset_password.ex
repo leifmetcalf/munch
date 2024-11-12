@@ -1,4 +1,4 @@
-defmodule MunchWeb.UserResetPasswordLive do
+defmodule MunchWeb.UserLive.ResetPassword do
   use MunchWeb, :live_view
 
   alias Munch.Accounts

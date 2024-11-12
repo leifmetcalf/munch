@@ -318,71 +318,57 @@ defmodule MunchWeb.CoreComponents do
     """
   end
 
-  attr :id, :any, default: nil
-  attr :name, :any
-  attr :label, :string, default: nil
-  attr :value, :any
+  attr :id, :string, required: true
+  slot :inner_block, required: true
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:email]"
-
-  attr :rest, :global,
-    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
-                multiple pattern placeholder readonly required rows size step)
-
-  attr :results, :list
-  attr :result_name, :string
-  attr :new_link, :string
-  attr :new_label, :string
-
-  def remote_datalist(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
-    assigns
-    |> assign(field: nil, id: assigns.id || field.id)
-    |> assign_new(:name, fn -> field.name end)
-    |> assign_new(:value, fn -> field.value end)
-    |> remote_datalist()
+  def modal(assigns) do
+    ~H"""
+    <dialog id={@id} class="p-4 rounded-lg w-auto h-auto">
+      <%= render_slot(@inner_block) %>
+    </dialog>
+    """
   end
 
-  def remote_datalist(assigns) do
+  def show_modal(js \\ %JS{}, id) do
+    js
+    |> JS.dispatch("munch:show-modal", to: id)
+  end
+
+  def close_modal(js \\ %JS{}, id) do
+    js
+    |> JS.dispatch("munch:close-modal", to: id)
+  end
+
+  @doc """
+  Renders a restaurant card
+  """
+  attr :restaurant, :map, required: true
+
+  def restaurant_card(assigns) do
     ~H"""
-    <div>
-      <.label for={@id}><%= @label %></.label>
-      <input
-        type="search"
-        name={@name}
-        id={@id <> "-search"}
-        value={Phoenix.HTML.Form.normalize_value("search", @value)}
-        class={[
-          "mt-2 w-full block border-t border-l border-r border-zinc-300 rounded-t-lg focus:border-zinc-400 focus:ring-0",
-          !@results && "rounded-b-lg"
-        ]}
-        autocomplete="off"
-        {@rest}
-      />
-      <ul
-        :if={@results}
-        id={@id <> "-results"}
-        class="border-b border-l border-r border-zinc-300 rounded-b-lg divide-y bg-zinc-50"
-      >
-        <li :for={result <- @results}>
-          <button
-            name={@result_name}
-            value={result.value}
-            class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-900 text-left"
-          >
-            <%= result.pretty %>
-          </button>
-        </li>
-        <li :if={@new_link && @results == []}>
-          <a
-            href={@new_link}
-            class="w-full block py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-900 text-left"
-          >
-            <%= @new_label %>
-          </a>
-        </li>
-      </ul>
+    <div class="rounded-lg border border-zinc-300 p-4">
+      <h3 class="text-lg font-semibold leading-6 text-zinc-900"><%= @restaurant.name %></h3>
+      <p class="mt-2 text-sm leading-6 text-zinc-600"><%= @restaurant.neighbourhood %></p>
+      <p class="mt-2 text-sm leading-6 text-zinc-600"><%= @restaurant.city %></p>
+      <p class="mt-2 text-sm leading-6 text-zinc-600"><%= @restaurant.country %></p>
     </div>
+    """
+  end
+
+  def restaurant_card_add(assigns) do
+    ~H"""
+    <div class="rounded-lg border border-zinc-300 p-4">
+      <.icon name="hero-plus" class="h-4 w-4" />
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a restaurant card skeleton
+  """
+  def restaurant_card_skeleton(assigns) do
+    ~H"""
+    <div class="rounded-lg border border-zinc-300 p-4">Placeholder</div>
     """
   end
 

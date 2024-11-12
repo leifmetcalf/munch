@@ -1,4 +1,4 @@
-defmodule MunchWeb.UserLoginLive do
+defmodule MunchWeb.UserLive.Login do
   use MunchWeb, :live_view
 
   def render(assigns) do

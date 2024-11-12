@@ -1,4 +1,4 @@
-defmodule MunchWeb.UserConfirmationLive do
+defmodule MunchWeb.UserLive.Confirmation do
   use MunchWeb, :live_view
 
   alias Munch.Accounts

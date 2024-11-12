@@ -36,15 +36,22 @@ defmodule MunchWeb.ListLive.Form do
         </.inputs_for>
       </div>
       <input type="hidden" name="list[items_drop][]" />
+
       <:actions>
+        <.button type="button" phx-click={show_modal("#restaurant-select-modal")}>
+          Add item
+        </.button>
         <.button phx-disable-with="Saving...">Save List</.button>
       </:actions>
     </.simple_form>
 
-    <.live_component
-      module={MunchWeb.RestaurantLive.SelectComponent}
-      id="restaurant-select-component"
-    />
+    <.modal id="restaurant-select-modal">
+      <.live_component
+        module={MunchWeb.RestaurantLive.SelectComponent}
+        id="restaurant-select-component"
+        submit_action={fn js -> close_modal(js, "#restaurant-select-modal") end}
+      />
+    </.modal>
 
     <.back navigate={return_path(@return_to, @list)}>Back</.back>
     """
@@ -94,7 +101,7 @@ defmodule MunchWeb.ListLive.Form do
   end
 
   defp save_list(socket, :edit, list_params) do
-    case Lists.update_list(socket.assigns.list, list_params) do
+    case Lists.update_list(socket.assigns.current_user, socket.assigns.list, list_params) do
       {:ok, list} ->
         {:noreply,
          socket
@@ -107,7 +114,7 @@ defmodule MunchWeb.ListLive.Form do
   end
 
   defp save_list(socket, :new, list_params) do
-    case Lists.create_list(list_params) do
+    case Lists.create_list(list_params |> Map.put("user_id", socket.assigns.current_user.id)) do
       {:ok, list} ->
         {:noreply,
          socket
@@ -120,16 +127,12 @@ defmodule MunchWeb.ListLive.Form do
   end
 
   defp return_path("index", _list), do: ~p"/lists"
-  defp return_path("show", list), do: ~p"/lists/#{list}"
+  defp return_path("show", list), do: ~p"/list/#{list}"
 
   @impl true
   def handle_info({:restaurant_selected, restaurant_id}, socket) do
     changeset =
-      Lists.change_list_prepend_restaurant(
-        restaurant_id,
-        socket.assigns.list,
-        socket.assigns.form.params
-      )
+      Lists.changeset_prepend_restaurant(socket.assigns.form.source, restaurant_id)
 
     {:noreply,
      socket
