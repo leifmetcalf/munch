@@ -38,7 +38,7 @@ defmodule MunchWeb.ListLive.Form do
       <input type="hidden" name="list[items_drop][]" />
 
       <:actions>
-        <.button type="button" phx-click={show_modal("#restaurant-select-modal")}>
+        <.button type="button" phx-click={show_modal("restaurant-select-modal")}>
           Add item
         </.button>
         <.button phx-disable-with="Saving...">Save List</.button>
@@ -49,7 +49,6 @@ defmodule MunchWeb.ListLive.Form do
       <.live_component
         module={MunchWeb.RestaurantLive.SelectComponent}
         id="restaurant-select-component"
-        submit_action={fn js -> close_modal(js, "#restaurant-select-modal") end}
       />
     </.modal>
 
@@ -138,7 +137,7 @@ defmodule MunchWeb.ListLive.Form do
      socket
      |> assign(:form, to_form(changeset))
      |> fill_restaurants()
-     |> push_event("close-restaurant-select-modal", %{})}
+     |> push_close_modal("restaurant-select-modal")}
   end
 
   def fill_restaurants(socket) do

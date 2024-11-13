@@ -37,6 +37,7 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
               name={@form[:restaurant_id].name}
               id={"#{@form[:restaurant_id].id}-#{restaurant.id}"}
               value={restaurant.id}
+              phx-disable-with="Adding..."
               class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
               phx-disable-with="Selecting..."
             >

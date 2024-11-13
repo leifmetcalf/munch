@@ -15,7 +15,7 @@ defmodule MunchWeb.UserLive.ProfileForm do
       <.restaurant_card restaurant={featured_restaurant.restaurant} />
     <% end %>
     <%= if length(@featured_restaurants) < 4 do %>
-      <div phx-click={show_modal("#add-featured-restaurant")}>
+      <div phx-click={show_modal("restaurant-select-modal")}>
         <.restaurant_card_add tag={length(@featured_restaurants)} />
       </div>
     <% end %>
@@ -23,11 +23,10 @@ defmodule MunchWeb.UserLive.ProfileForm do
       <.restaurant_card_skeleton />
     <% end %>
 
-    <.modal id="add-featured-restaurant">
+    <.modal id="restaurant-select-modal">
       <.live_component
         module={MunchWeb.RestaurantLive.SelectComponent}
-        id="add-featured-restaurant-select"
-        submit_action={fn js -> close_modal(js, "#add-featured-restaurant") end}
+        id="restaurant-select-component"
       />
     </.modal>
     """
@@ -47,6 +46,6 @@ defmodule MunchWeb.UserLive.ProfileForm do
       restaurant_id: restaurant_id
     })
 
-    {:noreply, socket}
+    {:noreply, socket |> push_close_modal("restaurant-select-modal")}
   end
 end

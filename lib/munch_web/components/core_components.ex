@@ -331,12 +331,20 @@ defmodule MunchWeb.CoreComponents do
 
   def show_modal(js \\ %JS{}, id) do
     js
-    |> JS.dispatch("munch:show-modal", to: id)
+    |> JS.dispatch("munch:show-modal", to: "##{id}")
   end
 
   def close_modal(js \\ %JS{}, id) do
     js
-    |> JS.dispatch("munch:close-modal", to: id)
+    |> JS.dispatch("munch:close-modal", to: "##{id}")
+  end
+
+  def push_show_modal(socket, id) do
+    Phoenix.LiveView.push_event(socket, "show-#{id}", %{})
+  end
+
+  def push_close_modal(socket, id) do
+    Phoenix.LiveView.push_event(socket, "close-#{id}", %{})
   end
 
   @doc """
