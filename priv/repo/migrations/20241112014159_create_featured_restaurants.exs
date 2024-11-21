@@ -5,9 +5,9 @@ defmodule Munch.Repo.Migrations.CreateFeaturedRestaurants do
     create table(:featured_restaurants, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :position, :integer, null: false
-      add :user_id, references(:users, on_delete: :nothing, type: :binary_id), null: false
+      add :user_id, references(:users, on_delete: :delete_all, type: :binary_id), null: false
 
-      add :restaurant_id, references(:restaurants, on_delete: :nothing, type: :binary_id),
+      add :restaurant_id, references(:restaurants, on_delete: :delete_all, type: :binary_id),
         null: false
 
       timestamps(type: :utc_datetime)

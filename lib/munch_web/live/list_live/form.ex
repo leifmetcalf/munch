@@ -114,7 +114,7 @@ defmodule MunchWeb.ListLive.Form do
   end
 
   defp save_list(socket, :new, list_params) do
-    case Lists.create_list(list_params |> Map.put("user_id", socket.assigns.current_user.id)) do
+    case Lists.create_list(socket.assigns.current_user, list_params) do
       {:ok, list} ->
         {:noreply,
          socket
@@ -130,14 +130,15 @@ defmodule MunchWeb.ListLive.Form do
   defp return_path("show", list), do: ~p"/list/#{list}"
 
   @impl true
-  def handle_info({:restaurant_selected, restaurant_id}, socket) do
+  def handle_info({:restaurant_selected, nil, restaurant_id}, socket) do
     changeset =
       Lists.changeset_prepend_restaurant(socket.assigns.form.source, restaurant_id)
 
     {:noreply,
      socket
      |> assign(:form, to_form(changeset))
-     |> fill_restaurants()}
+     |> fill_restaurants()
+     |> push_event("close-modal-restaurant-select-modal", %{})}
   end
 
   def fill_restaurants(socket) do

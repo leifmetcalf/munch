@@ -62,8 +62,8 @@ defmodule MunchWeb.Router do
       live "/users/settings/confirm_email/:token", UserLive.Settings, :confirm_email
       live "/users/edit", UserLive.ProfileForm, :edit
 
-      live "/restaurants/new", RestaurantLive.Form, :new
-      live "/restaurant/:id/edit", RestaurantLive.Form, :edit
+      live "/restaurants/new", RestaurantLive.New, :new
+      live "/restaurant/:id/edit", RestaurantLive.Edit, :edit
 
       live "/lists/new", ListLive.Form, :new
       live "/list/:id/edit", ListLive.Form, :edit

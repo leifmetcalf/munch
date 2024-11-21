@@ -7,6 +7,7 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
     {:ok,
      socket
      |> assign(:restaurants, nil)
+     |> assign(:tag, nil)
      |> assign(:form, to_form(%{}))}
   end
 
@@ -17,7 +18,7 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
         for={@form}
         id="restaurant-select-form"
         phx-change="validate"
-        phx-submit={JS.push("save") |> @submit_action.()}
+        phx-submit="save"
         phx-target={@myself}
       >
         <input
@@ -37,7 +38,7 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
               value={restaurant.id}
               class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
             >
-              <%= "#{restaurant.name} (#{restaurant.address})" %>
+              <%= "#{restaurant.name}" %>
             </button>
           </li>
           <li :if={@restaurants == []}>
@@ -72,12 +73,11 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
   end
 
   def handle_event("save", %{"restaurant_id" => restaurant_id}, socket) do
-    send(self(), {:restaurant_selected, restaurant_id})
+    send(self(), {:restaurant_selected, socket.assigns.tag, restaurant_id})
     {:noreply, socket |> assign(:form, to_form(%{})) |> assign(:restaurants, nil)}
   end
 
-  def handle_event("save", params, socket) do
-    IO.inspect(params)
+  def handle_event("save", _params, socket) do
     {:noreply, socket}
   end
 end

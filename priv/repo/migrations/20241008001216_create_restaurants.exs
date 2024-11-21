@@ -4,11 +4,13 @@ defmodule Munch.Repo.Migrations.CreateRestaurants do
   def change do
     create table(:restaurants, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :name, :string, null: false
-      add :address, :string, null: false
-      add :country, :string, null: false
-      add :city, :string, null: false
-      add :neighbourhood, :string, null: false
+      add :osm_type, :text
+      add :osm_id, :bigint
+      add :name, :text, null: false
+      add :location, :geometry, null: false
+      add :note, :text
+      add :iso_country_subdivision, :text
+      add :secondary_subdivision, :text
 
       timestamps(type: :utc_datetime)
     end

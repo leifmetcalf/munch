@@ -9,7 +9,9 @@ import Config
 
 config :munch,
   ecto_repos: [Munch.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
+
+config :munch, Munch.Repo, types: Munch.PostgresTypes
 
 # Configures the endpoint
 config :munch, MunchWeb.Endpoint,

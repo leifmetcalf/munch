@@ -5,11 +5,13 @@ defmodule Munch.Restaurants.Restaurant do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "restaurants" do
+    field :osm_type, Ecto.Enum, values: [node: "N", way: "W", relation: "R"]
+    field :osm_id, :integer
     field :name, :string
-    field :address, :string
-    field :country, :string
-    field :city, :string
-    field :neighbourhood, :string
+    field :location, Geo.PostGIS.Geometry
+    field :note, :string
+    field :iso_country_subdivision, :string
+    field :secondary_subdivision, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -17,7 +19,6 @@ defmodule Munch.Restaurants.Restaurant do
   @doc false
   def changeset(restaurant, attrs) do
     restaurant
-    |> cast(attrs, [:name, :address, :country, :city, :neighbourhood])
-    |> validate_required([:name, :address, :country, :city, :neighbourhood])
+    |> cast(attrs, [:note])
   end
 end

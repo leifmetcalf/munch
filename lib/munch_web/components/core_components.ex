@@ -323,7 +323,7 @@ defmodule MunchWeb.CoreComponents do
 
   def modal(assigns) do
     ~H"""
-    <dialog id={@id} class="p-4 rounded-lg w-auto h-auto">
+    <dialog id={@id} class="p-4 rounded-lg w-auto h-auto" phx-hook="Modal">
       <%= render_slot(@inner_block) %>
     </dialog>
     """

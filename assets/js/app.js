@@ -18,8 +18,8 @@
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
-import { Socket } from "../../../../"
-import { LiveSocket } from "../vendor/phoenix_live_view"
+import { Socket } from "phoenix"
+import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Sortable from "../vendor/Sortable"
 
@@ -39,16 +39,24 @@ let Hooks = {
       });
 
     }
+  },
+  Modal: {
+    mounted() {
+      this.handleEvent(`show-${this.el.id}`, () => {
+        this.el.showModal()
+      })
+      this.handleEvent(`close-${this.el.id}`, () => {
+        this.el.close()
+      })
+      this.el.addEventListener("munch:show-modal", () => {
+        this.el.showModal()
+      })
+      this.el.addEventListener("munch:close-modal", () => {
+        this.el.close()
+      })
+    }
   }
 }
-
-window.addEventListener("munch:show-modal", (e) => {
-  e.target.showModal()
-})
-
-window.addEventListener("munch:close-modal", (e) => {
-  e.target.close()
-})
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

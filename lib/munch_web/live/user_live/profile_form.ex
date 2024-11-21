@@ -16,7 +16,7 @@ defmodule MunchWeb.UserLive.ProfileForm do
     <% end %>
     <%= if length(@featured_restaurants) < 4 do %>
       <div phx-click={show_modal("#add-featured-restaurant")}>
-        <.restaurant_card_add />
+        <.restaurant_card_add tag={length(@featured_restaurants)} />
       </div>
     <% end %>
     <%= for _ <- 0..(2 - length(@featured_restaurants)) do %>
@@ -41,8 +41,12 @@ defmodule MunchWeb.UserLive.ProfileForm do
   end
 
   @impl true
-  def handle_info({:restaurant_selected, restaurant_id}, socket) do
-    IO.inspect(restaurant_id)
+  def handle_info({:restaurant_selected, position, restaurant_id}, socket) do
+    Profile.create_featured_restaurant(socket.assigns.user, %{
+      position: position,
+      restaurant_id: restaurant_id
+    })
+
     {:noreply, socket}
   end
 end
