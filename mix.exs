@@ -60,7 +60,8 @@ defmodule Munch.MixProject do
       {:dns_cluster, "~> 0.1"},
       {:bandit, "~> 1.5"},
       {:geo, "~> 4.0"},
-      {:geo_postgis, "~> 3.7"}
+      {:geo_postgis, "~> 3.7"},
+      {:oban, "~> 2.17"}
     ]
   end
 

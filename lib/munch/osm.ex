@@ -7,60 +7,149 @@ defmodule Munch.Osm do
   alias Munch.Repo
   alias Munch.Restaurants
 
-  def api_get_object(osm_type, osm_id) do
-    resp = Req.get!("https://api.openstreetmap.org/api/0.6/#{osm_type}/#{osm_id}.json")
+  def osm_get!(path) do
+    Req.get!(
+      url: path,
+      base_url: "https://api.openstreetmap.org/api/0.6",
+      headers: [user_agent: "Munch/0.1"]
+    )
+  end
 
-    decoded = Jason.decode!(resp.body)
+  def nominatim_get!(path) do
+    Req.get!(
+      url: path,
+      base_url: "https://nominatim.openstreetmap.org",
+      headers: [user_agent: "Munch/0.1"]
+    )
+  end
 
-    case decoded do
+  def osm_get_object(:node, osm_id) do
+    resp = osm_get!("node/#{osm_id}.json")
+
+    case resp.body do
       %{"elements" => [%{"lat" => lattitude, "lon" => longitude, "tags" => tags}]} ->
-        %{lattitude: lattitude, longitude: longitude, tags: tags}
+        {:ok, %{lattitude: lattitude, longitude: longitude, tags: tags}}
 
       _ ->
-        raise "Invalid response from OpenStreetMaps API: #{decoded}"
+        {:error, "Invalid response from OpenStreetMaps API: #{resp}"}
     end
   end
 
-  def pull_restaurant(osm_type, osm_id) do
-    object = api_get_object(osm_type, osm_id)
-    %{"name" => name} = object.tags
-
-    Repo.insert!(%Restaurants.Restaurant{
-      osm_type: osm_type,
-      osm_id: osm_id,
-      name: name,
-      location: %Geo.Point{coordinates: {object.longitude, object.lattitude}, srid: 4326},
-      note: "",
-      iso_country_subdivision: "",
-      secondary_subdivision: ""
-    })
+  def osm_get_object(:way, _osm_id) do
+    {:error, "Importing ways is not implemented yet"}
   end
 
-  def copy_osm_restaurants() do
-    osm_restaurants = Repo.all(Munch.Osm.Restaurant)
+  def osm_get_object(:relation, _osm_id) do
+    {:error, "Importing relations is not implemented yet"}
+  end
 
-    restaurants =
-      osm_restaurants
-      |> Enum.map(fn osm_restaurant ->
-        %Restaurants.Restaurant{
-          osm_type: osm_restaurant.osm_type,
-          osm_id: osm_restaurant.osm_id,
-          name: osm_restaurant.tags["name"],
-          location: osm_restaurant.location,
-          note: "",
-          iso_country_subdivision: nil,
-          secondary_subdivision: nil
+  @doc """
+  Import a restaurant and queue a task to pull its details from Nominatim.
+  """
+  def import_fresh_restaurant(osm_type, osm_id) do
+    with {:ok, object} <- osm_get_object(osm_type, osm_id),
+         {:ok, name} <- Map.fetch(object.tags, "name") do
+      point = %Geo.Point{coordinates: {object.longitude, object.lattitude}, srid: 4326}
+
+      Oban.insert(
+        Munch.Importer.new(%{
+          "osm_type" => osm_type,
+          "osm_id" => osm_id
+        })
+      )
+
+      Repo.insert!(%Restaurants.Restaurant{
+        osm_type: osm_type,
+        osm_id: osm_id,
+        name: name,
+        location: point,
+        note: "",
+        country: "",
+        iso_country_subdivision: ""
+      })
+    end
+  end
+
+  def nominatim_get_details(osm_type, osm_id) do
+    osm_type_char =
+      case osm_type do
+        :node -> "N"
+        :way -> "W"
+        :relation -> "R"
+      end
+
+    resp = nominatim_get!("lookup?osm_ids=#{osm_type_char}#{osm_id}&format=jsonv2")
+
+    case resp.body do
+      [
+        %{
+          "lat" => latitude,
+          "lon" => longitude,
+          "name" => name,
+          "display_name" => display_name,
+          "address" =>
+            %{
+              "ISO3166-2-lvl4" => iso_country_subdivision,
+              "country" => country
+            } = address
         }
-      end)
-      |> IO.inspect()
+      ] ->
+        {:ok,
+         %{
+           osm_type: osm_type,
+           osm_id: osm_id,
+           name: name,
+           display_name: display_name,
+           location: %Geo.Point{
+             coordinates: {String.to_float(longitude), String.to_float(latitude)},
+             srid: 4326
+           },
+           note: "",
+           country: country,
+           iso_country_subdivision: iso_country_subdivision,
+           address: address
+         }}
 
-    restaurants
-    |> Enum.map(fn restaurant ->
-      Repo.insert!(restaurant)
-    end)
+      _ ->
+        {:error, "Invalid response from Nominatim API: #{resp}"}
+    end
   end
 
-  def sync_restaurant(_restaurant) do
-    IO.inspect("TODO: Implement sync with OSM")
+  @doc """
+  Search for restaurants with Nominatim.
+
+  options:
+
+  * `:exclude` - A list of place IDs to exclude from the results.
+  """
+  def search_restaurants(search, opts \\ []) do
+    exclude = Keyword.get(opts, :exclude, [])
+    # TODO: use AI to assemble a structured query from the search string
+    resp =
+      nominatim_get!(
+        "search?q=#{search}&layer=poi&exclude=#{exclude |> Enum.join(",")}&format=jsonv2"
+      )
+
+    resp.body
+    |> Map.new(fn x ->
+      case x do
+        %{
+          "place_id" => place_id,
+          "lat" => lattitude,
+          "lon" => longitude,
+          "display_name" => display_name,
+          "osm_type" => osm_type,
+          "osm_id" => osm_id
+        } ->
+          {place_id,
+           %{
+             lattitude: lattitude,
+             longitude: longitude,
+             display_name: display_name,
+             osm_type: String.to_atom(osm_type),
+             osm_id: osm_id
+           }}
+      end
+    end)
   end
 end

@@ -1,4 +1,4 @@
-defmodule MunchWeb.RestaurantLive.New do
+defmodule MunchWeb.RestaurantLive.ImportManual do
   use MunchWeb, :live_view
 
   alias Munch.Restaurants
@@ -13,9 +13,8 @@ defmodule MunchWeb.RestaurantLive.New do
     </.header>
 
     <p>
-      New restaurants and other changes to the OpenStreetMap map should be
-      imported automatically every 24 hours. You can import a restaurant
-      ahead of schedule by entering its osm_type and osm_id below.
+      If you can't find the restaurant by search, you can import a restaurant
+      by entering its osm_type and osm_id below.
     </p>
     <.simple_form for={@form} id="osm-form" phx-submit="save">
       <.input
@@ -52,7 +51,7 @@ defmodule MunchWeb.RestaurantLive.New do
 
   @impl true
   def handle_event("save", %{"osm_type" => osm_type, "osm_id" => osm_id}, socket) do
-    case Osm.pull_restaurant(osm_type, osm_id) do
+    case Osm.import_fresh_restaurant(osm_type, osm_id) do
       {:ok, restaurant} ->
         {:noreply,
          socket

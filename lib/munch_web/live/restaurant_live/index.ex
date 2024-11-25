@@ -21,7 +21,9 @@ defmodule MunchWeb.RestaurantLive.Index do
       row_click={fn {_id, restaurant} -> JS.navigate(~p"/restaurant/#{restaurant}") end}
     >
       <:col :let={{_id, restaurant}} label="Name"><%= restaurant.name %></:col>
-      <:col :let={{_id, restaurant}} label="Address"><%= restaurant.address %></:col>
+      <:col :let={{_id, restaurant}} label="Address">
+        <%= restaurant.osm_type %> <%= restaurant.osm_id %>
+      </:col>
       <:action :let={{_id, restaurant}}>
         <div class="sr-only">
           <.link navigate={~p"/restaurant/#{restaurant}"}>Show</.link>

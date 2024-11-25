@@ -31,32 +31,33 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
           autofocus
           placeholder="Search for a restaurant"
         />
-        <ul :if={@restaurants} class="mt-4 divide-y divide-zinc-300">
-          <li :for={restaurant <- @restaurants}>
-            <button
-              name={@form[:restaurant_id].name}
-              value={restaurant.id}
-              class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
-            >
-              <%= "#{restaurant.name}" %>
-            </button>
-          </li>
-          <li :if={@restaurants == []}>
-            <a
-              href={~p"/restaurants/new"}
-              target="_blank"
-              class="w-full block py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
-            >
-              Add new restaurant...
-            </a>
-          </li>
-        </ul>
+        <.button phx-disable-with="Searching...">Search</.button>
       </.form>
+      <ul :if={@restaurants} class="mt-4 divide-y divide-zinc-300">
+        <li :for={restaurant <- @restaurants}>
+          <button
+            class="w-full py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
+            phx-click={JS.push("select", value: %{restaurant_id: restaurant.id})}
+            phx-disable-with="Selecting..."
+          >
+            <%= "#{restaurant.name}" %>
+          </button>
+        </li>
+        <li :if={@restaurants == []}>
+          <a
+            href={~p"/restaurants/new"}
+            target="_blank"
+            class="w-full block py-2 px-3 leading-6 hover:bg-zinc-200 active:text-zinc-700 text-left"
+          >
+            Add new restaurant...
+          </a>
+        </li>
+      </ul>
     </div>
     """
   end
 
-  def handle_event("validate", params = %{"search" => search}, socket) do
+  def handle_event("save", params = %{"search" => search}, socket) do
     {:noreply,
      socket
      |> assign(:form, to_form(params))
@@ -72,12 +73,8 @@ defmodule MunchWeb.RestaurantLive.SelectComponent do
      )}
   end
 
-  def handle_event("save", %{"restaurant_id" => restaurant_id}, socket) do
+  def handle_event("select", %{"restaurant_id" => restaurant_id}, socket) do
     send(self(), {:restaurant_selected, socket.assigns.tag, restaurant_id})
     {:noreply, socket |> assign(:form, to_form(%{})) |> assign(:restaurants, nil)}
-  end
-
-  def handle_event("save", _params, socket) do
-    {:noreply, socket}
   end
 end

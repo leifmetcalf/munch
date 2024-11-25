@@ -59,7 +59,11 @@ defmodule MunchWeb.RestaurantLive.Edit do
   end
 
   def handle_event("trigger_sync", _params, socket) do
-    Osm.sync_restaurant(socket.assigns.restaurant)
+    Osm.import_fresh_restaurant(
+      socket.assigns.restaurant.osm_type,
+      socket.assigns.restaurant.osm_id
+    )
+
     {:noreply, socket}
   end
 

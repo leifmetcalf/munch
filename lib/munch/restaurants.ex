@@ -22,13 +22,7 @@ defmodule Munch.Restaurants do
   end
 
   @doc """
-  Search restaurants by name or address. Words are aggregated with AND.
-
-  ## Examples
-
-      iex> search_restaurants("Ma")
-      [%Restaurant{}, ...]
-
+  Search local restaurants by name or address. Words are aggregated with AND.
   """
   def search_restaurants(search) do
     words = String.split(search)

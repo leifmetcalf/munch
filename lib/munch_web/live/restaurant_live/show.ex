@@ -18,10 +18,6 @@ defmodule MunchWeb.RestaurantLive.Show do
 
     <.list>
       <:item title="Name"><%= @restaurant.name %></:item>
-      <:item title="Country"><%= @restaurant.country %></:item>
-      <:item title="City"><%= @restaurant.city %></:item>
-      <:item title="Neighbourhood"><%= @restaurant.neighbourhood %></:item>
-      <:item title="Address"><%= @restaurant.address %></:item>
     </.list>
 
     <.back navigate={~p"/restaurants"}>Back to restaurants</.back>

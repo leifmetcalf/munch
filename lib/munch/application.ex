@@ -10,6 +10,7 @@ defmodule Munch.Application do
     children = [
       MunchWeb.Telemetry,
       Munch.Repo,
+      {Oban, Application.get_env(:munch, Oban)},
       {DNSCluster, query: Application.get_env(:munch, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Munch.PubSub},
       # Start a worker by calling: Munch.Worker.start_link(arg)
