@@ -106,7 +106,7 @@ defmodule MunchWeb.ListLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, "List updated successfully")
-         |> push_navigate(to: return_path(socket.assigns.return_to, list))}
+         |> redirect(to: return_path(socket.assigns.return_to, list))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset)) |> fill_restaurants()}
@@ -119,7 +119,7 @@ defmodule MunchWeb.ListLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, "List created successfully")
-         |> push_navigate(to: return_path(socket.assigns.return_to, list))}
+         |> redirect(to: return_path(socket.assigns.return_to, list))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset)) |> fill_restaurants()}
@@ -127,7 +127,7 @@ defmodule MunchWeb.ListLive.Form do
   end
 
   defp return_path("index", _list), do: ~p"/lists"
-  defp return_path("show", list), do: ~p"/list/#{list}"
+  defp return_path("show", list), do: ~p"/lists/by-id/#{list}"
 
   @impl true
   def handle_info({:restaurant_selected, nil, restaurant_id}, socket) do
@@ -138,7 +138,7 @@ defmodule MunchWeb.ListLive.Form do
      socket
      |> assign(:form, to_form(changeset))
      |> fill_restaurants()
-     |> push_event("close-modal-restaurant-select-modal", %{})}
+     |> push_event("close-restaurant-select-modal", %{})}
   end
 
   def fill_restaurants(socket) do

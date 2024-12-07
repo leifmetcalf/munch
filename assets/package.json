@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "tailwindcss": "next",
+    "leaflet": "1.9.4"
+  }
+}

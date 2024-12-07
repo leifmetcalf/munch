@@ -31,7 +31,6 @@ defmodule MunchWeb.RestaurantLive.Edit do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:page_title, "Edit Restaurant")
      |> assign(:restaurant, restaurant)
      |> assign(:form, to_form(Restaurants.change_restaurant(restaurant)))}
   end
@@ -51,7 +50,7 @@ defmodule MunchWeb.RestaurantLive.Edit do
         {:noreply,
          socket
          |> put_flash(:info, "Restaurant updated successfully")
-         |> push_navigate(to: return_path(socket.assigns.return_to, restaurant))}
+         |> redirect(to: return_path(socket.assigns.return_to, restaurant))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
@@ -59,14 +58,18 @@ defmodule MunchWeb.RestaurantLive.Edit do
   end
 
   def handle_event("trigger_sync", _params, socket) do
-    Osm.import_fresh_restaurant(
-      socket.assigns.restaurant.osm_type,
-      socket.assigns.restaurant.osm_id
-    )
+    case Osm.update_fresh_restaurant(socket.assigns.restaurant) do
+      {:ok, restaurant} ->
+        {:noreply,
+         socket
+         |> assign(restaurant: restaurant)
+         |> put_flash(:info, "Restaurant synced successfully")}
 
-    {:noreply, socket}
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to sync restaurant")}
+    end
   end
 
   defp return_path("index", _restaurant), do: ~p"/restaurants"
-  defp return_path("show", restaurant), do: ~p"/restaurant/#{restaurant}"
+  defp return_path("show", restaurant), do: ~p"/restaurants/by-id/#{restaurant}"
 end

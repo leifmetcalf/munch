@@ -1,4 +1,33 @@
-<main class="px-4 py-20 sm:px-6 lg:px-8">
+<header class="flex justify-between p-2 border-b border-zinc-900">
+  <h1><a href={~p"/"}>Munch</a></h1>
+  <ul class="flex gap-2">
+    <li>
+      <button type="button">
+        <.icon name="hero-plus" />
+      </button>
+    </li>
+    <li>
+      <button type="button" phx-click={JS.toggle(to: "#menu")}>
+        <.icon name="hero-bars-3"/>
+      </button>
+    </li>
+  </ul>
+</header>
+<nav id="menu" class="absolute w-full hidden bg-white">
+  <ul class="divide-y divide-zinc-300">
+    <%= if @current_user do %>
+      <li class="p-2"><p><%= @current_user.email %></p></li>
+      <li class="p-2"><.link navigate={~p"/users/log_out"} method="delete" class="block w-full">Log out</.link></li>
+      <li class="p-2"><.link navigate={~p"/users/settings"} class="block w-full">Settings</.link></li>
+    <% else %>
+      <li class="p-2"><.link navigate={~p"/users/register"} class="block w-full">Register</.link></li>
+      <li class="p-2"><.link navigate={~p"/users/log_in"} class="block w-full">Log in</.link></li>
+    <% end %>
+    <li class="p-2"><.link navigate={~p"/restaurants"} class="block w-full">Restaurants</.link></li>
+    <li class="p-2"><.link navigate={~p"/lists"} class="block w-full">Lists</.link></li>
+  </ul>
+</nav>
+<main class="px-4 py-6">
   <div class="mx-auto max-w-2xl">
     <%= @inner_content %>
   </div>

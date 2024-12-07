@@ -8,6 +8,7 @@ defmodule Munch.Lists.List do
     field :name, :string
     belongs_to :user, Munch.Accounts.User
     has_many :items, Munch.Lists.Item, preload_order: [asc: :position], on_replace: :delete
+    field :length, :integer, virtual: true
 
     timestamps(type: :utc_datetime)
   end

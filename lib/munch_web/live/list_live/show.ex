@@ -10,7 +10,7 @@ defmodule MunchWeb.ListLive.Show do
       <%= @list.name %>
       <:subtitle>Inserted <%= @list.inserted_at %></:subtitle>
       <:actions>
-        <.link navigate={~p"/list/#{@list}/edit?return_to=show"}>
+        <.link navigate={~p"/lists/by-id/#{@list}/edit?return_to=show"}>
           <.button>Edit list</.button>
         </.link>
       </:actions>

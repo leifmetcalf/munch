@@ -15,30 +15,13 @@ defmodule MunchWeb.RestaurantLive.Index do
       </:actions>
     </.header>
 
-    <.table
-      id="restaurants"
-      rows={@streams.restaurants}
-      row_click={fn {_id, restaurant} -> JS.navigate(~p"/restaurant/#{restaurant}") end}
-    >
-      <:col :let={{_id, restaurant}} label="Name"><%= restaurant.name %></:col>
-      <:col :let={{_id, restaurant}} label="Address">
-        <%= restaurant.osm_type %> <%= restaurant.osm_id %>
-      </:col>
-      <:action :let={{_id, restaurant}}>
-        <div class="sr-only">
-          <.link navigate={~p"/restaurant/#{restaurant}"}>Show</.link>
-        </div>
-        <.link navigate={~p"/restaurant/#{restaurant}/edit"}>Edit</.link>
-      </:action>
-      <:action :let={{id, restaurant}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: restaurant.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
-        >
-          Delete
+    <ul>
+      <li :for={{dom_id, restaurant} <- @streams.restaurants} id={dom_id}>
+        <.link navigate={~p"/restaurants/by-id/#{restaurant}"}>
+          <%= restaurant.display_name %>
         </.link>
-      </:action>
-    </.table>
+      </li>
+    </ul>
     """
   end
 
@@ -46,15 +29,7 @@ defmodule MunchWeb.RestaurantLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Listing Restaurants")
+     |> assign(:page_title, "Restaurants list")
      |> stream(:restaurants, Restaurants.list_restaurants())}
-  end
-
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    restaurant = Restaurants.get_restaurant!(id)
-    {:ok, _} = Restaurants.delete_restaurant(restaurant)
-
-    {:noreply, stream_delete(socket, :restaurants, restaurant)}
   end
 end

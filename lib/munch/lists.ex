@@ -19,11 +19,28 @@ defmodule Munch.Lists do
 
   """
   def list_lists do
-    Repo.all(List)
+    Repo.all(
+      from l in List,
+        as: :lists,
+        select: %{
+          l
+          | length:
+              subquery(from i in Item, where: i.list_id == parent_as(:lists).id, select: count(i))
+        }
+    )
   end
 
   def user_lists(user) do
-    Repo.all(from(l in List, where: l.user_id == ^user.id))
+    Repo.all(
+      from l in List,
+        as: :lists,
+        where: l.user_id == ^user.id,
+        select: %{
+          l
+          | length:
+              subquery(from i in Item, where: i.list_id == parent_as(:lists).id, select: count(i))
+        }
+    )
   end
 
   @doc """

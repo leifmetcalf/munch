@@ -63,11 +63,11 @@ defmodule MunchWeb.Router do
       live "/users/edit", UserLive.ProfileForm, :edit
 
       live "/restaurants/new", RestaurantLive.Import, :new
-      live "/restaurants/new-by-id", RestaurantLive.ImportManual, :new
-      live "/restaurant/:id/edit", RestaurantLive.Edit, :edit
+      live "/restaurants/new-manual", RestaurantLive.ImportManual, :new
+      live "/restaurants/by-id/:id/edit", RestaurantLive.Edit, :edit
 
       live "/lists/new", ListLive.Form, :new
-      live "/list/:id/edit", ListLive.Form, :edit
+      live "/lists/by-id/:id/edit", ListLive.Form, :edit
     end
   end
 
@@ -84,12 +84,12 @@ defmodule MunchWeb.Router do
       live "/users/confirm", UserLive.ConfirmationInstructions, :new
 
       live "/restaurants", RestaurantLive.Index, :index
-      live "/restaurant/:id", RestaurantLive.Show, :show
+      live "/restaurants/by-id/:id", RestaurantLive.Show, :show
 
       live "/lists", ListLive.Index, :index
-      live "/list/:id", ListLive.Show, :show
+      live "/lists/by-id/:id", ListLive.Show, :show
 
-      live "/user/:id", UserLive.Profile, :show
+      live "/users/by-id/:id", UserLive.Profile, :show
     end
   end
 end

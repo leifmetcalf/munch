@@ -5,7 +5,9 @@ defmodule Munch.Importer do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"osm_type" => osm_type, "osm_id" => osm_id}}) do
-    {:ok, restaurant} = Munch.Osm.nominatim_get_details(osm_type, osm_id)
+    {:ok, restaurant} =
+      Munch.Osm.nominatim_get_details(String.to_atom(osm_type), String.to_integer(osm_id))
+
     Restaurants.create_restaurant(restaurant)
   end
 end

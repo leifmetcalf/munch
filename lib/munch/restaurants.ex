@@ -31,7 +31,7 @@ defmodule Munch.Restaurants do
       from r in Restaurant,
         where:
           ^Enum.reduce(words, dynamic(true), fn word, acc ->
-            dynamic([r], ^acc and ilike(r.name, ^"%#{word}%"))
+            dynamic([r], ^acc and ilike(r.display_name, ^"%#{word}%"))
           end)
     )
   end

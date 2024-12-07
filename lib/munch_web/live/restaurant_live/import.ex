@@ -26,18 +26,18 @@ defmodule MunchWeb.RestaurantLive.Import do
           <%= result.display_name %>
         </button>
       </li>
-      <li :if={@results == []}>
-        <a href={~p"/restaurants/new-by-id"} target="_blank">
-          Add by osm_type / osm_id
-        </a>
-      </li>
+      <li :if={@results == %{}}></li>
     </ul>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(form: to_form(%{})) |> assign(results: %{})}
+    {:ok,
+     socket
+     |> assign(:page_title, "Import restaurant")
+     |> assign(form: to_form(%{}))
+     |> assign(results: nil)}
   end
 
   @impl true
@@ -48,7 +48,16 @@ defmodule MunchWeb.RestaurantLive.Import do
   def handle_event("import", %{"place_id" => place_id}, socket) do
     place = socket.assigns.results[place_id]
     {:ok, restaurant} = Osm.nominatim_get_details(place.osm_type, place.osm_id)
-    Restaurants.create_restaurant(restaurant)
-    {:noreply, socket}
+
+    case Restaurants.create_restaurant(restaurant) do
+      {:ok, restaurant} ->
+        {:noreply,
+         socket
+         |> redirect(to: ~p"/restaurants/by-id/#{restaurant}")
+         |> put_flash(:info, "Restaurant imported successfully")}
+
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to import restaurant")}
+    end
   end
 end

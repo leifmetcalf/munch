@@ -22,12 +22,12 @@ import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Sortable from "../vendor/Sortable"
+import L from "leaflet"
 
-
-let Hooks = {
+const Hooks = {
   SortableInputs: {
     mounted() {
-      let proxy = document.createElement('input');
+      const proxy = document.createElement('input');
       proxy.type = 'hidden';
       proxy.name = 'sortable-change-proxy';
       this.el.appendChild(proxy);
@@ -55,11 +55,20 @@ let Hooks = {
         this.el.close()
       })
     }
+  },
+  Map: {
+    mounted() {
+      const map = L.map(this.el).setView([51.505, -0.09], 13);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+    }
   }
 }
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {
+const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
   hooks: Hooks
@@ -77,6 +86,33 @@ liveSocket.connect()
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
-liveSocket.enableDebug()
 window.liveSocket = liveSocket
 
+if (process.env.NODE_ENV === "development") {
+  window.addEventListener("phx:live_reload:attached", ({ detail: reloader }) => {
+    // Enable server log streaming to client.
+    // Disable with reloader.disableServerLogs()
+    reloader.enableServerLogs()
+
+    // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
+    //
+    //   * click with "c" key pressed to open at caller location
+    //   * click with "d" key pressed to open at function component definition location
+    let keyDown
+    window.addEventListener("keydown", e => keyDown = e.key)
+    window.addEventListener("keyup", e => keyDown = null)
+    window.addEventListener("click", e => {
+      if (keyDown === "c") {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        reloader.openEditorAtCaller(e.target)
+      } else if (keyDown === "d") {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        reloader.openEditorAtDef(e.target)
+      }
+    }, true)
+
+    window.liveReloader = reloader
+  })
+}
