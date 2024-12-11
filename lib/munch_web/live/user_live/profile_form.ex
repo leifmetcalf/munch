@@ -13,6 +13,13 @@ defmodule MunchWeb.UserLive.ProfileForm do
     <h2>Featured Restaurants</h2>
     <%= for featured_restaurant <- @featured_restaurants do %>
       <.restaurant_card restaurant={featured_restaurant.restaurant} />
+      <.modal id="restaurant-select-modal">
+        <.live_component
+          module={MunchWeb.RestaurantLive.SelectComponent}
+          id={"restaurant-select-component"
+
+        />
+    </.modal>
     <% end %>
     <%= if length(@featured_restaurants) < 4 do %>
       <div phx-click={show_modal("restaurant-select-modal")}>
@@ -23,12 +30,7 @@ defmodule MunchWeb.UserLive.ProfileForm do
       <.restaurant_card_skeleton />
     <% end %>
 
-    <.modal id="restaurant-select-modal">
-      <.live_component
-        module={MunchWeb.RestaurantLive.SelectComponent}
-        id="restaurant-select-component"
-      />
-    </.modal>
+
     """
   end
 

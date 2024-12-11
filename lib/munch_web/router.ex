@@ -64,10 +64,10 @@ defmodule MunchWeb.Router do
 
       live "/restaurants/new", RestaurantLive.Import, :new
       live "/restaurants/new-manual", RestaurantLive.ImportManual, :new
-      live "/restaurants/by-id/:id/edit", RestaurantLive.Edit, :edit
+      live "/restaurants/by-ids/by-id/:id/edit", RestaurantLive.Edit, :edit
 
       live "/lists/new", ListLive.Form, :new
-      live "/lists/by-id/:id/edit", ListLive.Form, :edit
+      live "/lists/by-ids/by-id/:id/edit", ListLive.Form, :edit
     end
   end
 
