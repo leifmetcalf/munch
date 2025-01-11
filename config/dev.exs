@@ -56,6 +56,7 @@ config :munch, MunchWeb.Endpoint,
 # Watch static and templates for browser reloading.
 config :munch, MunchWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
@@ -67,7 +68,7 @@ config :munch, MunchWeb.Endpoint,
 config :munch, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
